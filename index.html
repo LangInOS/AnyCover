@@ -63,10 +63,13 @@
           版式模板
           <select id="templateSelect"></select>
         </label>
-        <label>
-          背景花纹
+        <div class="field">
+          <div class="field-label-row">
+            <span>背景花纹</span>
+            <button id="randomPatternBtn" class="tiny-random" type="button" title="随机花纹" aria-label="随机花纹">随</button>
+          </div>
           <select id="patternSelect"></select>
-        </label>
+        </div>
         <label>
           花纹强度
           <input id="patternStrength" type="range" min="0" max="80" value="32">
@@ -76,13 +79,16 @@
           <input id="fontSizeInput" type="range" min="72" max="210" value="150">
         </label>
         <div>
-          <div class="label-text">配色方案</div>
+          <div class="field-label-row label-text">
+            <span>配色方案</span>
+            <button id="randomPaletteBtn" class="tiny-random" type="button" title="随机配色" aria-label="随机配色">随</button>
+          </div>
           <div id="paletteGrid" class="palette-grid"></div>
         </div>
         <button id="exportBtn" class="primary" type="button">导出 PNG</button>
         <div class="inline-actions">
           <button id="randomStyleBtn" class="ghost" type="button">随机样式</button>
-          <button id="generateBatchBtn" class="ghost" type="button">生成候选</button>
+          <button id="generateBatchBtn" class="ghost" type="button">换一组候选</button>
         </div>
       </aside>
 

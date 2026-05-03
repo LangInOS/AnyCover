@@ -114,13 +114,24 @@ p {
   letter-spacing: .2em;
 }
 
-label, .label-text {
+label, .label-text, .field {
   display: block;
   margin-bottom: 9px;
   color: var(--muted);
   font-size: 12px;
   font-weight: 650;
   letter-spacing: .04em;
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.field-label-row.label-text {
+  margin-bottom: 9px;
 }
 
 input, select, textarea {
@@ -172,6 +183,20 @@ button {
   cursor: pointer;
 }
 
+.tiny-random {
+  min-width: 26px;
+  min-height: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #121211;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .primary {
   width: 100%;
   margin-top: 12px;
@@ -191,7 +216,8 @@ button {
 }
 
 .ghost:hover,
-.mode:hover {
+.mode:hover,
+.tiny-random:hover {
   border-color: #44443f;
   background-color: rgba(255,255,255,.03);
 }

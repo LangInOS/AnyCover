@@ -46,6 +46,7 @@ const state = {
   template: templates[0],
   pattern: patterns[0],
   palette: palettes[0],
+  variantSeed: 0,
   variants: []
 };
 
@@ -117,7 +118,9 @@ function bindEvents() {
   $('modeBatch').addEventListener('click', () => setMode('batch'));
   $('exportBtn').addEventListener('click', exportPng);
   $('randomStyleBtn').addEventListener('click', randomStyle);
-  $('generateBatchBtn').addEventListener('click', () => makeVariants(state.mode === 'batch' ? 8 : 5));
+  $('generateBatchBtn').addEventListener('click', generateVariants);
+  $('randomPatternBtn').addEventListener('click', randomPattern);
+  $('randomPaletteBtn').addEventListener('click', randomPalette);
   $('randomHighlightBtn').addEventListener('click', randomHighlight);
   $('clearHighlightBtn').addEventListener('click', () => {
     $('titleInput').value = $('titleInput').value.replaceAll('`', '');
@@ -134,12 +137,22 @@ function setMode(mode) {
   state.mode = mode;
   $('modeSingle').classList.toggle('active', mode === 'single');
   $('modeBatch').classList.toggle('active', mode === 'batch');
-  $('batchMeta').textContent = mode === 'batch' ? '同一文案生成 8 张平台/风格候选，点击应用' : '当前平台的不同风格候选，点击可应用';
+  setBatchMeta();
   refreshVariants();
+}
+
+function setBatchMeta(text) {
+  $('batchMeta').textContent = text || (state.mode === 'batch' ? '同一文案生成 8 张平台/风格候选，点击应用' : '当前平台的不同风格候选，点击可应用');
 }
 
 function refreshVariants() {
   makeVariants(state.mode === 'batch' ? 8 : 5);
+}
+
+function generateVariants() {
+  state.variantSeed += 1;
+  makeVariants(state.mode === 'batch' ? 8 : 5, true);
+  setBatchMeta(state.mode === 'batch' ? '已换一组跨平台候选，点击应用' : '已换一组当前平台候选，点击应用');
 }
 
 function setActivePalette() {
@@ -459,6 +472,27 @@ function randomStyle() {
   refreshVariants();
 }
 
+function randomPattern() {
+  state.pattern = pickDifferent(patterns, state.pattern);
+  $('patternSelect').value = state.pattern.id;
+  render();
+  refreshVariants();
+}
+
+function randomPalette() {
+  state.palette = pickDifferent(palettes, state.palette);
+  setActivePalette();
+  render();
+  refreshVariants();
+}
+
+function pickDifferent(list, current) {
+  if (list.length < 2) return current;
+  let next = pick(list);
+  while (next === current) next = pick(list);
+  return next;
+}
+
 function randomHighlight() {
   const raw = $('titleInput').value.replaceAll('`', '');
   const chars = [...raw];
@@ -479,15 +513,19 @@ function randomWatermark() {
   render();
 }
 
-function makeVariants(count) {
+function makeVariants(count, shuffle = false) {
   const grid = $('variantGrid');
   grid.innerHTML = '';
+  const paletteStart = palettes.indexOf(state.palette);
+  const patternStart = patterns.indexOf(state.pattern);
+  const templateStart = templates.indexOf(state.template);
+  const offset = shuffle ? state.variantSeed : 0;
   state.variants = Array.from({ length: count }, (_, index) => ({
-    platform: state.mode === 'batch' ? platforms[index % platforms.length] : state.platform,
-    palette: palettes[(palettes.indexOf(state.palette) + index) % palettes.length],
-    pattern: patterns[(patterns.indexOf(state.pattern) + index) % patterns.length],
-    template: templates[(templates.indexOf(state.template) + index) % templates.length],
-    input: { ...getInput(), size: Math.max(82, Number($('fontSizeInput').value) + (index - 2) * 8), strength: .18 + (index % 5) * .1 }
+    platform: state.mode === 'batch' ? platforms[(index + offset) % platforms.length] : state.platform,
+    palette: palettes[(paletteStart + index + offset) % palettes.length],
+    pattern: patterns[(patternStart + index * 2 + offset) % patterns.length],
+    template: templates[(templateStart + index + offset) % templates.length],
+    input: { ...getInput(), size: Math.max(82, Number($('fontSizeInput').value) + ((index + offset) % 5 - 2) * 8), strength: .18 + ((index + offset) % 5) * .1 }
   }));
 
   state.variants.forEach((variant, index) => {
