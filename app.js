@@ -68,7 +68,7 @@ function init() {
   buildPaletteGrid();
   bindEvents();
   render();
-  makeVariants(5);
+  makeVariants(variantCount());
 }
 
 function fillSelect(id, items) {
@@ -176,13 +176,17 @@ function setBatchMeta(text) {
 }
 
 function refreshVariants() {
-  makeVariants(state.mode === 'batch' ? 8 : 5);
+  makeVariants(variantCount());
 }
 
 function generateVariants() {
   state.variantSeed += 1;
-  makeVariants(state.mode === 'batch' ? 8 : 5, true);
+  makeVariants(variantCount(), true);
   setBatchMeta(state.mode === 'batch' ? '已换一组多平台候选，点击应用' : '已换一组当前平台候选，点击应用');
+}
+
+function variantCount() {
+  return state.mode === 'batch' ? 12 : 8;
 }
 
 function setActivePalette() {
@@ -642,9 +646,12 @@ function makeVariants(count, shuffle = false) {
     thumb.width = variant.platform.width;
     thumb.height = variant.platform.height;
     drawCover(thumb.getContext('2d'), variant.platform, variant.palette, variant.template, variant.pattern, variant.input);
+    const frame = document.createElement('div');
+    frame.className = 'variant-thumb';
+    frame.appendChild(thumb);
     const label = document.createElement('span');
     label.textContent = `${variant.platform.name} · ${variant.palette.name}`;
-    item.append(thumb, label);
+    item.append(frame, label);
     item.addEventListener('click', () => applyVariant(index));
     grid.appendChild(item);
   });

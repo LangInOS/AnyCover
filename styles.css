@@ -352,33 +352,48 @@ button {
 
 .variant-grid {
   display: flex;
-  gap: 7px;
+  gap: 9px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding-bottom: 6px;
+  scroll-snap-type: x proximity;
 }
 
 .variant {
-  flex: 0 0 112px;
+  flex: 0 0 118px;
+  display: flex;
+  flex-direction: column;
+  min-height: 138px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #10100f;
   overflow: hidden;
   cursor: pointer;
+  scroll-snap-align: start;
 }
 
 .variant.active { border-color: var(--accent); }
 
+.variant-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88px;
+  padding: 6px;
+  background: #080808;
+}
+
 .variant canvas {
   display: block;
-  width: 100%;
-  height: 58px;
-  object-fit: contain;
-  background: #080808;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
   border-radius: 0;
 }
 
 .variant span {
   display: -webkit-box;
+  margin-top: auto;
   min-height: 32px;
   padding: 5px 6px 6px;
   color: var(--muted);
@@ -390,7 +405,11 @@ button {
 }
 
 @media (min-width: 1200px) {
-  .variant { flex-basis: 126px; }
+  .variant {
+    flex-basis: 138px;
+    min-height: 154px;
+  }
+  .variant-thumb { height: 96px; }
   .variant span {
     min-height: 43px;
     -webkit-line-clamp: 3;
