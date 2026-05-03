@@ -45,8 +45,46 @@ const palettes = [
   { id: 'plum', name: '深梅玫瑰', bg: '#261824', bg2: '#342031', text: '#f3e3e7', muted: '#947a8b', accent: '#d77a96', mark: '#ffffff' },
   { id: 'charcoal-red', name: '炭灰朱砂', bg: '#151413', bg2: '#24201d', text: '#efe8dc', muted: '#8d8277', accent: '#c84f3c', mark: '#ffffff' },
   { id: 'moss-paper', name: '苔纸墨绿', bg: '#d9ddcf', bg2: '#c9d0be', text: '#20251d', muted: '#68715f', accent: '#506f3d', mark: '#20251d' },
-  { id: 'deep-cyan', name: '深青冷白', bg: '#091617', bg2: '#102426', text: '#e8f1ec', muted: '#6f8988', accent: '#4fc3b1', mark: '#ffffff' }
+  { id: 'deep-cyan', name: '深青冷白', bg: '#091617', bg2: '#102426', text: '#e8f1ec', muted: '#6f8988', accent: '#4fc3b1', mark: '#ffffff' },
+  { id: 'ash-lime', name: '灰烬青柠', bg: '#171917', bg2: '#252824', text: '#edf0df', muted: '#878c7c', accent: '#b7d35d', mark: '#ffffff' },
+  { id: 'clay-blue', name: '陶土雾蓝', bg: '#2d302d', bg2: '#39413f', text: '#ede3d5', muted: '#a29a8f', accent: '#83a7b3', mark: '#ffffff' },
+  { id: 'black-crimson', name: '黑底绛红', bg: '#0e0c0d', bg2: '#1f1416', text: '#f2e8df', muted: '#897a78', accent: '#b94356', mark: '#ffffff' },
+  { id: 'linen-teal', name: '亚麻松石', bg: '#e1dccb', bg2: '#d1d0c0', text: '#192421', muted: '#667168', accent: '#24837a', mark: '#192421' },
+  { id: 'forest-amber', name: '森绿琥珀', bg: '#121a15', bg2: '#1f2a20', text: '#efe6ce', muted: '#828b75', accent: '#d19a3a', mark: '#ffffff' },
+  { id: 'iron-violet', name: '铁灰紫罗', bg: '#1a1920', bg2: '#292735', text: '#eee7df', muted: '#8b8795', accent: '#9b83d4', mark: '#ffffff' },
+  { id: 'rice-ink', name: '米纸墨黑', bg: '#ebe4d4', bg2: '#dcd2c0', text: '#141311', muted: '#6b6258', accent: '#2c2a25', mark: '#141311' },
+  { id: 'ocean-sand', name: '海雾沙金', bg: '#202b31', bg2: '#2d3a40', text: '#eee5d4', muted: '#9aa1a2', accent: '#c9ad72', mark: '#ffffff' },
+  { id: 'pine-rose', name: '松针玫红', bg: '#13201b', bg2: '#20352d', text: '#f0e8dc', muted: '#83928a', accent: '#d66d86', mark: '#ffffff' },
+  { id: 'slate-orange', name: '石板橙线', bg: '#202326', bg2: '#303539', text: '#ece6dc', muted: '#90969a', accent: '#e28b4d', mark: '#ffffff' },
+  { id: 'warm-gray', name: '暖灰朱线', bg: '#d8d2c6', bg2: '#c8c1b6', text: '#1d1c1a', muted: '#6f6962', accent: '#b44d3b', mark: '#1d1c1a' },
+  { id: 'blueprint', name: '蓝图白线', bg: '#111b2a', bg2: '#1c2d45', text: '#e6edf1', muted: '#8190a0', accent: '#7fb2e8', mark: '#ffffff' },
+  { id: 'cocoa-mint', name: '可可薄荷', bg: '#1e1713', bg2: '#2f231b', text: '#efe1d1', muted: '#9a8574', accent: '#77c1a3', mark: '#ffffff' },
+  { id: 'jade-paper', name: '玉纸深墨', bg: '#dce4dc', bg2: '#cbd8cf', text: '#17211c', muted: '#66756d', accent: '#0f6b57', mark: '#17211c' },
+  { id: 'midnight-silver', name: '午夜银灰', bg: '#0f1115', bg2: '#1d222a', text: '#eef0ef', muted: '#7f858c', accent: '#bfc7c9', mark: '#ffffff' },
+  { id: 'mulberry', name: '桑葚灰粉', bg: '#241a20', bg2: '#33252d', text: '#f2e4e8', muted: '#9b818e', accent: '#c86485', mark: '#ffffff' },
+  { id: 'bronze-green', name: '铜绿旧纸', bg: '#24251c', bg2: '#343428', text: '#eee3c8', muted: '#958d75', accent: '#9f8450', mark: '#ffffff' },
+  { id: 'fog-black', name: '雾白黑标', bg: '#f0eee6', bg2: '#dedbd2', text: '#171716', muted: '#74716a', accent: '#111111', mark: '#171716' },
+  { id: 'red-bean', name: '赤豆米白', bg: '#2a1514', bg2: '#3a201d', text: '#f3e7d8', muted: '#a0877e', accent: '#cc6757', mark: '#ffffff' },
+  { id: 'cold-moss', name: '冷苔青灰', bg: '#17201e', bg2: '#23302d', text: '#e5ebe4', muted: '#7c8b86', accent: '#86b686', mark: '#ffffff' },
+  { id: 'indigo-cream', name: '靛蓝奶白', bg: '#17182a', bg2: '#252742', text: '#f0eadc', muted: '#898aa1', accent: '#cbbf8a', mark: '#ffffff' },
+  { id: 'graphite-blue', name: '石墨蓝光', bg: '#16191d', bg2: '#242a31', text: '#eef0ec', muted: '#848b92', accent: '#5aa7d6', mark: '#ffffff' },
+  { id: 'lotus-ink', name: '荷粉墨黑', bg: '#ece3df', bg2: '#ddd1cb', text: '#1b1918', muted: '#786d68', accent: '#b95f72', mark: '#1b1918' },
+  { id: 'dry-grass', name: '枯草墨绿', bg: '#272718', bg2: '#393723', text: '#efe5c8', muted: '#999073', accent: '#c0b15e', mark: '#ffffff' },
+  { id: 'storm-teal', name: '风暴青绿', bg: '#111719', bg2: '#1d2b2f', text: '#e9efec', muted: '#7a8a8e', accent: '#45a99a', mark: '#ffffff' },
+  { id: 'wine-paper', name: '酒红素纸', bg: '#e5ddd1', bg2: '#d4cabe', text: '#1f1918', muted: '#746762', accent: '#8e2833', mark: '#1f1918' },
+  { id: 'charcoal-lilac', name: '炭黑丁香', bg: '#141316', bg2: '#232027', text: '#eee7df', muted: '#8d8490', accent: '#b391c4', mark: '#ffffff' },
+  { id: 'sage-clay', name: '鼠尾陶灰', bg: '#cacfc0', bg2: '#b9c1b0', text: '#20231e', muted: '#697060', accent: '#8d6b4f', mark: '#20231e' },
+  { id: 'black-copper', name: '黑铜细线', bg: '#0d0c0b', bg2: '#1b1713', text: '#eee5d7', muted: '#887c70', accent: '#b77a42', mark: '#ffffff' },
+  { id: 'lake-gray', name: '湖灰青线', bg: '#263033', bg2: '#344145', text: '#e9e2d6', muted: '#98a0a0', accent: '#73b4b1', mark: '#ffffff' },
+  { id: 'plain-red', name: '白底朱红', bg: '#eeeae1', bg2: '#dfd8ce', text: '#191716', muted: '#756d65', accent: '#c5362c', mark: '#191716' },
+  { id: 'olive-black', name: '橄黑明黄', bg: '#11130e', bg2: '#202419', text: '#efead7', muted: '#858879', accent: '#dfc84d', mark: '#ffffff' },
+  { id: 'deep-plum-gold', name: '深梅旧金', bg: '#1a1118', bg2: '#2c1b28', text: '#f0e2dc', muted: '#927b89', accent: '#c59a53', mark: '#ffffff' },
+  { id: 'cyan-paper', name: '青纸黑字', bg: '#d8e3df', bg2: '#c8d6d2', text: '#17201f', muted: '#63736f', accent: '#176d7c', mark: '#17201f' },
+  { id: 'carbon-blue', name: '炭蓝冷光', bg: '#0c1015', bg2: '#17202b', text: '#edf0f0', muted: '#76818c', accent: '#4f8fd8', mark: '#ffffff' },
+  { id: 'earth-green', name: '土绿暖白', bg: '#211f17', bg2: '#312d20', text: '#f0e6cf', muted: '#958c78', accent: '#739b5f', mark: '#ffffff' }
 ];
+
+const palettesPerPage = 12;
 
 const state = {
   mode: 'single',
@@ -121,9 +159,8 @@ function buildPaletteGrid() {
 }
 
 function getVisiblePalettes() {
-  const pageSize = 6;
-  const start = (state.palettePage * pageSize) % palettes.length;
-  return Array.from({ length: pageSize }, (_, index) => palettes[(start + index) % palettes.length]);
+  const start = (state.palettePage * palettesPerPage) % palettes.length;
+  return Array.from({ length: palettesPerPage }, (_, index) => palettes[(start + index) % palettes.length]);
 }
 
 function bindEvents() {
@@ -196,7 +233,7 @@ function setActivePalette() {
 }
 
 function showPaletteGroupForCurrent() {
-  state.palettePage = Math.floor(palettes.indexOf(state.palette) / 6);
+  state.palettePage = Math.floor(palettes.indexOf(state.palette) / palettesPerPage);
   buildPaletteGrid();
 }
 
@@ -587,7 +624,7 @@ function randomPalette() {
 }
 
 function cyclePaletteGroup() {
-  state.palettePage = (state.palettePage + 1) % Math.ceil(palettes.length / 6);
+  state.palettePage = (state.palettePage + 1) % Math.ceil(palettes.length / palettesPerPage);
   buildPaletteGrid();
 }
 
