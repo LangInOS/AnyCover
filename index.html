@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnyCover - 多平台封面生成器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="topbar">
+      <div>
+        <h1>AnyCover</h1>
+        <p>输入观点 -> 选择平台与样式 -> 生成任意场景封面 PNG</p>
+      </div>
+      <div class="top-actions">
+        <button id="modeSingle" class="mode active" type="button">单图</button>
+        <button id="modeBatch" class="mode" type="button">批量候选</button>
+      </div>
+    </header>
+
+    <section class="layout">
+      <aside class="panel copy-panel">
+        <h2>文案</h2>
+        <label>
+          顶部标签
+          <input id="tagInput" value="ANYCOVER">
+        </label>
+        <label>
+          引导句
+          <input id="leadInput" value="把一个观点做成">
+        </label>
+        <label>
+          核心标题
+          <textarea id="titleInput">能让人停下来的`封面`</textarea>
+          <span class="hint">用反引号包裹高亮词，例如：我的`AI工作流`</span>
+        </label>
+        <div class="inline-actions">
+          <button id="randomHighlightBtn" class="ghost" type="button">随机高亮</button>
+          <button id="clearHighlightBtn" class="ghost" type="button">清除高亮</button>
+        </div>
+        <label>
+          背景水印字
+          <input id="watermarkInput" maxlength="4" placeholder="留空自动取高亮词">
+        </label>
+        <div class="inline-actions watermark-actions">
+          <button id="randomWatermarkBtn" class="ghost" type="button">随机水印</button>
+          <button id="clearWatermarkBtn" class="ghost" type="button">跟随高亮</button>
+        </div>
+        <label>
+          署名
+          <input id="signInput" value="AnyCover · creator · 2026">
+        </label>
+      </aside>
+
+      <aside class="panel style-panel">
+        <h2>样式</h2>
+        <label>
+          平台尺寸
+          <select id="platformSelect"></select>
+        </label>
+        <label>
+          版式模板
+          <select id="templateSelect"></select>
+        </label>
+        <label>
+          背景花纹
+          <select id="patternSelect"></select>
+        </label>
+        <label>
+          花纹强度
+          <input id="patternStrength" type="range" min="0" max="80" value="32">
+        </label>
+        <label>
+          主字号
+          <input id="fontSizeInput" type="range" min="72" max="210" value="150">
+        </label>
+        <div>
+          <div class="label-text">配色方案</div>
+          <div id="paletteGrid" class="palette-grid"></div>
+        </div>
+        <button id="exportBtn" class="primary" type="button">导出 PNG</button>
+        <div class="inline-actions">
+          <button id="randomStyleBtn" class="ghost" type="button">随机样式</button>
+          <button id="generateBatchBtn" class="ghost" type="button">生成候选</button>
+        </div>
+      </aside>
+
+      <section class="panel preview-panel">
+        <div class="preview-head">
+          <h2>预览</h2>
+          <span id="previewMeta">X 封面 · 2500x1000</span>
+        </div>
+        <div class="canvas-stage">
+          <canvas id="coverCanvas" width="2500" height="1000"></canvas>
+        </div>
+        <div class="batch-head">
+          <span>候选封面</span>
+          <span id="batchMeta">同一文案的不同平台/风格候选，点击可应用</span>
+        </div>
+        <div id="variantGrid" class="variant-grid"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
