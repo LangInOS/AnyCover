@@ -90,16 +90,26 @@
         <div>
           <div class="field-label-row label-text">
             <span>配色方案</span>
-            <button id="randomPaletteBtn" class="tiny-random" type="button" title="随机配色" aria-label="随机配色">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="4" y="4" width="16" height="16" rx="3"></rect>
-                <circle cx="9" cy="9" r="1.4"></circle>
-                <circle cx="15" cy="9" r="1.4"></circle>
-                <circle cx="12" cy="12" r="1.4"></circle>
-                <circle cx="9" cy="15" r="1.4"></circle>
-                <circle cx="15" cy="15" r="1.4"></circle>
-              </svg>
-            </button>
+            <div class="label-actions">
+              <button id="cyclePaletteBtn" class="tiny-random" type="button" title="换一组配色" aria-label="换一组配色">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 7h9.5l-2-2"></path>
+                  <path d="M17 17H7.5l2 2"></path>
+                  <path d="M17 7l2-2 2 2"></path>
+                  <path d="M7 17l-2 2-2-2"></path>
+                </svg>
+              </button>
+              <button id="randomPaletteBtn" class="tiny-random" type="button" title="随机配色" aria-label="随机配色">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+                  <circle cx="9" cy="9" r="1.4"></circle>
+                  <circle cx="15" cy="9" r="1.4"></circle>
+                  <circle cx="12" cy="12" r="1.4"></circle>
+                  <circle cx="9" cy="15" r="1.4"></circle>
+                  <circle cx="15" cy="15" r="1.4"></circle>
+                </svg>
+              </button>
+            </div>
           </div>
           <div id="paletteGrid" class="palette-grid"></div>
         </div>

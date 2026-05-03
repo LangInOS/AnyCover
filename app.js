@@ -29,6 +29,7 @@ const patterns = [
   { id: 'diagonal', name: '斜向纹理' },
   { id: 'cross', name: '交叉细线' },
   { id: 'corners', name: '四角标尺' },
+  { id: 'noise', name: '颗粒噪点' },
   { id: 'none', name: '无花纹' }
 ];
 
@@ -53,6 +54,7 @@ const state = {
   template: horizontalTemplates[0],
   pattern: patterns[0],
   palette: palettes[0],
+  palettePage: 0,
   variantSeed: 0,
   variants: []
 };
@@ -99,7 +101,9 @@ function syncTemplateSelect() {
 
 function buildPaletteGrid() {
   const grid = $('paletteGrid');
-  palettes.forEach((palette) => {
+  const visiblePalettes = getVisiblePalettes();
+  grid.innerHTML = '';
+  visiblePalettes.forEach((palette) => {
     const swatch = document.createElement('button');
     swatch.className = `swatch${palette.id === state.palette.id ? ' active' : ''}`;
     swatch.type = 'button';
@@ -114,6 +118,12 @@ function buildPaletteGrid() {
     });
     grid.appendChild(swatch);
   });
+}
+
+function getVisiblePalettes() {
+  const pageSize = 6;
+  const start = (state.palettePage * pageSize) % palettes.length;
+  return Array.from({ length: pageSize }, (_, index) => palettes[(start + index) % palettes.length]);
 }
 
 function bindEvents() {
@@ -143,6 +153,7 @@ function bindEvents() {
   $('generateBatchBtn').addEventListener('click', generateVariants);
   $('randomPatternBtn').addEventListener('click', randomPattern);
   $('randomPaletteBtn').addEventListener('click', randomPalette);
+  $('cyclePaletteBtn').addEventListener('click', cyclePaletteGroup);
   $('randomHighlightBtn').addEventListener('click', randomHighlight);
   $('clearHighlightBtn').addEventListener('click', () => {
     $('titleInput').value = $('titleInput').value.replaceAll('`', '');
@@ -181,6 +192,11 @@ function setActivePalette() {
   document.querySelectorAll('.swatch').forEach((item) => {
     item.classList.toggle('active', item.dataset.id === state.palette.id);
   });
+}
+
+function showPaletteGroupForCurrent() {
+  state.palettePage = Math.floor(palettes.indexOf(state.palette) / 6);
+  buildPaletteGrid();
 }
 
 function getInput() {
@@ -309,8 +325,24 @@ function drawPattern(target, w, h, type, color, opacity) {
     line(target, w - p, p, w - p - l, p); line(target, w - p, p, w - p, p + l);
     line(target, p, h - p, p + l, h - p); line(target, p, h - p, p, h - p - l);
     line(target, w - p, h - p, w - p - l, h - p); line(target, w - p, h - p, w - p, h - p - l);
+  } else if (type === 'noise') {
+    const count = Math.round((w * h) / 850);
+    for (let index = 0; index < count; index += 1) {
+      const x = seededNoise(index, 17) * w;
+      const y = seededNoise(index, 43) * h;
+      const radius = .7 + seededNoise(index, 89) * 1.8;
+      target.globalAlpha = opacity * (.35 + seededNoise(index, 131) * .65);
+      target.beginPath();
+      target.arc(x, y, radius, 0, Math.PI * 2);
+      target.fill();
+    }
   }
   target.restore();
+}
+
+function seededNoise(index, salt) {
+  const value = Math.sin(index * 127.1 + salt * 311.7) * 43758.5453;
+  return value - Math.floor(value);
 }
 
 function line(target, x1, y1, x2, y2) {
@@ -534,7 +566,7 @@ function randomStyle() {
   $('templateSelect').value = state.template.id;
   $('patternStrength').value = 18 + Math.floor(Math.random() * 44);
   $('fontSizeInput').value = 118 + Math.floor(Math.random() * 62);
-  setActivePalette();
+  showPaletteGroupForCurrent();
   render();
   refreshVariants();
 }
@@ -548,9 +580,14 @@ function randomPattern() {
 
 function randomPalette() {
   state.palette = pickDifferent(palettes, state.palette);
-  setActivePalette();
+  showPaletteGroupForCurrent();
   render();
   refreshVariants();
+}
+
+function cyclePaletteGroup() {
+  state.palettePage = (state.palettePage + 1) % Math.ceil(palettes.length / 6);
+  buildPaletteGrid();
 }
 
 function pickDifferent(list, current) {
@@ -638,7 +675,7 @@ function applyVariant(index) {
   $('templateSelect').value = state.template.id;
   $('fontSizeInput').value = variant.input.size;
   $('patternStrength').value = Math.round(variant.input.strength * 100);
-  setActivePalette();
+  showPaletteGroupForCurrent();
   document.querySelectorAll('.variant').forEach((item, itemIndex) => item.classList.toggle('active', itemIndex === index));
   render({ input: variant.input });
 }
