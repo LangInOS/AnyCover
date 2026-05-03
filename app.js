@@ -9,11 +9,18 @@ const platforms = [
   { id: 'douyin', name: '抖音/竖屏', width: 1080, height: 1920, ratio: '9:16' }
 ];
 
-const templates = [
+const horizontalTemplates = [
   { id: 'center', name: '中轴标题', align: 'center' },
   { id: 'left', name: '左侧刊物', align: 'left' },
   { id: 'poster', name: '竖版海报', align: 'poster' },
   { id: 'split', name: '分栏摘要', align: 'split' }
+];
+
+const verticalTemplates = [
+  { id: 'v-poster', name: '居中海报', align: 'v-poster' },
+  { id: 'v-top', name: '上标题版', align: 'v-top' },
+  { id: 'v-left', name: '左轴标题', align: 'v-left' },
+  { id: 'v-bottom', name: '底部标题', align: 'v-bottom' }
 ];
 
 const patterns = [
@@ -43,7 +50,7 @@ const palettes = [
 const state = {
   mode: 'single',
   platform: platforms[0],
-  template: templates[0],
+  template: horizontalTemplates[0],
   pattern: patterns[0],
   palette: palettes[0],
   variantSeed: 0,
@@ -54,7 +61,7 @@ const $ = (id) => document.getElementById(id);
 
 function init() {
   fillSelect('platformSelect', platforms);
-  fillSelect('templateSelect', templates);
+  syncTemplateSelect();
   fillSelect('patternSelect', patterns);
   buildPaletteGrid();
   bindEvents();
@@ -64,12 +71,30 @@ function init() {
 
 function fillSelect(id, items) {
   const select = $(id);
+  select.innerHTML = '';
   items.forEach((item) => {
     const option = document.createElement('option');
     option.value = item.id;
     option.textContent = item.ratio ? `${item.name} (${item.ratio})` : item.name;
     select.appendChild(option);
   });
+}
+
+function isVerticalPlatform(platform = state.platform) {
+  return platform.height > platform.width;
+}
+
+function templatesForPlatform(platform = state.platform) {
+  return isVerticalPlatform(platform) ? verticalTemplates : horizontalTemplates;
+}
+
+function syncTemplateSelect() {
+  const templates = templatesForPlatform();
+  if (!templates.includes(state.template)) {
+    state.template = templates[0];
+  }
+  fillSelect('templateSelect', templates);
+  $('templateSelect').value = state.template.id;
 }
 
 function buildPaletteGrid() {
@@ -97,15 +122,12 @@ function bindEvents() {
   });
   $('platformSelect').addEventListener('change', (event) => {
     state.platform = platforms.find((item) => item.id === event.target.value);
-    if (['xiaohongshu', 'douyin'].includes(state.platform.id) && state.template.align !== 'poster') {
-      state.template = templates[2];
-      $('templateSelect').value = state.template.id;
-    }
+    syncTemplateSelect();
     render();
     refreshVariants();
   });
   $('templateSelect').addEventListener('change', (event) => {
-    state.template = templates.find((item) => item.id === event.target.value);
+    state.template = templatesForPlatform().find((item) => item.id === event.target.value);
     render();
     refreshVariants();
   });
@@ -248,9 +270,10 @@ function drawCover(target, platform, palette, template, pattern, input) {
     h,
     vertical
   );
-  const align = vertical ? 'poster' : template.align;
+  const align = template.align;
 
-  if (align === 'left') drawLeft(target, w, h, palette, input, titleParts, titleSize, margin);
+  if (vertical) drawVertical(target, w, h, palette, input, titleParts, titleSize, margin, align);
+  else if (align === 'left') drawLeft(target, w, h, palette, input, titleParts, titleSize, margin);
   else if (align === 'split') drawSplit(target, w, h, palette, input, titleParts, titleSize, margin);
   else drawCenter(target, w, h, palette, input, titleParts, titleSize, margin, vertical);
 }
@@ -308,6 +331,50 @@ function drawWatermark(target, w, h, palette, input) {
   target.font = `900 ${Math.round(Math.min(w, h) * .86)}px Georgia, "Songti SC", serif`;
   target.fillText(mark.slice(0, 2), w * .84, h * .52);
   target.restore();
+}
+
+function drawVertical(target, w, h, palette, input, parts, titleSize, margin, align) {
+  const base = Math.min(w, h);
+  const leadSize = Math.max(18, base * .03);
+  const tagSize = Math.max(12, base * .018);
+  const signSize = Math.max(13, base * .021);
+  const titleWidth = align === 'v-left' ? w - margin * 2.4 : w - margin * 2;
+  const lines = wrapParts(target, parts, titleSize, titleWidth);
+  const lineHeight = titleSize * 1.12;
+  const titleBlock = lines.length * lineHeight;
+
+  if (align === 'v-top') {
+    const titleY = h * .34;
+    drawSmall(target, input.tag, w / 2, margin * 1.35, palette.muted, tagSize, .42);
+    drawSmall(target, input.lead, w / 2, titleY - titleBlock / 2 - leadSize * 1.35, palette.muted, leadSize, .24);
+    drawRichLines(target, lines, w / 2, titleY, titleSize, palette, 'center');
+    drawRule(target, w * .28, h * .68, w * .72, h * .68, palette.accent);
+    drawSmall(target, input.sign, w / 2, h - margin * .9, palette.muted, signSize, .12);
+    return;
+  }
+
+  if (align === 'v-left') {
+    const x = margin * 1.45;
+    const titleY = h * .5;
+    drawRule(target, margin * .85, margin, margin * .85, h - margin, palette.accent);
+    drawSmall(target, input.tag, x, h * .18, palette.muted, tagSize, .35, 'left');
+    drawSmall(target, input.lead, x, titleY - titleBlock / 2 - leadSize * 1.35, palette.muted, leadSize, .12, 'left');
+    drawRichLines(target, lines, x, titleY, titleSize, palette, 'left');
+    drawSmall(target, input.sign, x, Math.min(h - margin, titleY + titleBlock / 2 + signSize * 1.8), palette.muted, signSize, .08, 'left');
+    return;
+  }
+
+  if (align === 'v-bottom') {
+    const titleY = h * .68;
+    drawSmall(target, input.tag, w / 2, margin * 1.3, palette.muted, tagSize, .42);
+    drawRule(target, w * .32, h * .22, w * .68, h * .22, palette.accent);
+    drawSmall(target, input.lead, w / 2, titleY - titleBlock / 2 - leadSize * 1.35, palette.muted, leadSize, .24);
+    drawRichLines(target, lines, w / 2, titleY, titleSize, palette, 'center');
+    drawSmall(target, input.sign, w / 2, Math.min(h - margin * .7, titleY + titleBlock / 2 + signSize * 1.7), palette.muted, signSize, .12);
+    return;
+  }
+
+  drawCenter(target, w, h, palette, input, parts, titleSize, margin, true);
 }
 
 function drawCenter(target, w, h, palette, input, parts, titleSize, margin, vertical) {
@@ -462,7 +529,7 @@ function drawTracked(target, text, x, y, spacing, align) {
 function randomStyle() {
   state.palette = pick(palettes);
   state.pattern = pick(patterns);
-  state.template = pick(templates);
+  state.template = pick(templatesForPlatform());
   $('patternSelect').value = state.pattern.id;
   $('templateSelect').value = state.template.id;
   $('patternStrength').value = 18 + Math.floor(Math.random() * 44);
@@ -518,15 +585,20 @@ function makeVariants(count, shuffle = false) {
   grid.innerHTML = '';
   const paletteStart = palettes.indexOf(state.palette);
   const patternStart = patterns.indexOf(state.pattern);
-  const templateStart = templates.indexOf(state.template);
+  const currentTemplates = templatesForPlatform();
+  const templateStart = currentTemplates.indexOf(state.template);
   const offset = shuffle ? state.variantSeed : 0;
-  state.variants = Array.from({ length: count }, (_, index) => ({
-    platform: state.mode === 'batch' ? platforms[(index + offset) % platforms.length] : state.platform,
-    palette: palettes[(paletteStart + index + offset) % palettes.length],
-    pattern: patterns[(patternStart + index * 2 + offset) % patterns.length],
-    template: templates[(templateStart + index + offset) % templates.length],
-    input: { ...getInput(), size: Math.max(82, Number($('fontSizeInput').value) + ((index + offset) % 5 - 2) * 8), strength: .18 + ((index + offset) % 5) * .1 }
-  }));
+  state.variants = Array.from({ length: count }, (_, index) => {
+    const platform = state.mode === 'batch' ? platforms[(index + offset) % platforms.length] : state.platform;
+    const platformTemplates = templatesForPlatform(platform);
+    return {
+      platform,
+      palette: palettes[(paletteStart + index + offset) % palettes.length],
+      pattern: patterns[(patternStart + index * 2 + offset) % patterns.length],
+      template: platformTemplates[(templateStart + index + offset) % platformTemplates.length],
+      input: { ...getInput(), size: Math.max(82, Number($('fontSizeInput').value) + ((index + offset) % 5 - 2) * 8), strength: .18 + ((index + offset) % 5) * .1 }
+    };
+  });
 
   state.variants.forEach((variant, index) => {
     const item = document.createElement('button');
@@ -561,6 +633,7 @@ function applyVariant(index) {
   state.pattern = variant.pattern;
   state.template = variant.template;
   $('platformSelect').value = state.platform.id;
+  syncTemplateSelect();
   $('patternSelect').value = state.pattern.id;
   $('templateSelect').value = state.template.id;
   $('fontSizeInput').value = variant.input.size;
