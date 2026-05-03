@@ -358,7 +358,7 @@ button {
 }
 
 .variant {
-  flex: 0 0 92px;
+  flex: 0 0 112px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #10100f;
@@ -378,13 +378,23 @@ button {
 }
 
 .variant span {
-  display: block;
-  padding: 6px;
+  display: -webkit-box;
+  min-height: 32px;
+  padding: 5px 6px 6px;
   color: var(--muted);
   font-size: 10px;
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+@media (min-width: 1200px) {
+  .variant { flex-basis: 126px; }
+  .variant span {
+    min-height: 43px;
+    -webkit-line-clamp: 3;
+  }
 }
 
 @media (max-width: 700px) {
