@@ -84,6 +84,7 @@ function buildPaletteGrid() {
       state.palette = palette;
       setActivePalette();
       render();
+      refreshVariants();
     });
     grid.appendChild(swatch);
   });
@@ -100,14 +101,17 @@ function bindEvents() {
       $('templateSelect').value = state.template.id;
     }
     render();
+    refreshVariants();
   });
   $('templateSelect').addEventListener('change', (event) => {
     state.template = templates.find((item) => item.id === event.target.value);
     render();
+    refreshVariants();
   });
   $('patternSelect').addEventListener('change', (event) => {
     state.pattern = patterns.find((item) => item.id === event.target.value);
     render();
+    refreshVariants();
   });
   $('modeSingle').addEventListener('click', () => setMode('single'));
   $('modeBatch').addEventListener('click', () => setMode('batch'));
@@ -130,8 +134,12 @@ function setMode(mode) {
   state.mode = mode;
   $('modeSingle').classList.toggle('active', mode === 'single');
   $('modeBatch').classList.toggle('active', mode === 'batch');
-  $('batchMeta').textContent = mode === 'batch' ? '同一文案生成 8 张平台/风格候选，点击应用' : '同一文案的不同平台/风格候选，点击可应用';
-  makeVariants(mode === 'batch' ? 8 : 5);
+  $('batchMeta').textContent = mode === 'batch' ? '同一文案生成 8 张平台/风格候选，点击应用' : '当前平台的不同风格候选，点击可应用';
+  refreshVariants();
+}
+
+function refreshVariants() {
+  makeVariants(state.mode === 'batch' ? 8 : 5);
 }
 
 function setActivePalette() {
@@ -448,6 +456,7 @@ function randomStyle() {
   $('fontSizeInput').value = 118 + Math.floor(Math.random() * 62);
   setActivePalette();
   render();
+  refreshVariants();
 }
 
 function randomHighlight() {
