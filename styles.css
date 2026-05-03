@@ -51,7 +51,6 @@ p {
   letter-spacing: .03em;
 }
 
-.top-actions,
 .inline-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -67,26 +66,61 @@ p {
 }
 
 .top-actions {
-  width: 180px;
-  padding: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #141413;
 }
 
-.mode {
-  height: 38px;
-  border: 0;
-  border-radius: 7px;
+.multi-toggle {
+  position: relative;
   color: var(--muted);
-  background: transparent;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: .04em;
   cursor: pointer;
 }
 
-.mode.active {
-  color: #0b1511;
+.multi-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.switch-track {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #0f0f0e;
+}
+
+.switch-track span {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform .16s ease, background .16s ease;
+}
+
+.multi-toggle input:checked + .switch-track {
   background: var(--accent);
-  font-weight: 700;
+  border-color: var(--accent);
+}
+
+.multi-toggle input:checked + .switch-track span {
+  transform: translateX(15px);
+  background: #08130f;
 }
 
 .layout {
@@ -236,7 +270,7 @@ button {
 }
 
 .ghost:hover,
-.mode:hover,
+.multi-toggle:hover,
 .tiny-random:hover {
   border-color: #44443f;
   background-color: rgba(255,255,255,.03);
@@ -337,7 +371,9 @@ button {
 .variant canvas {
   display: block;
   width: 100%;
-  height: auto;
+  height: 58px;
+  object-fit: contain;
+  background: #080808;
   border-radius: 0;
 }
 

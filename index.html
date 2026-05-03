@@ -13,10 +13,11 @@
         <h1>AnyCover</h1>
         <p>输入观点 -> 选择平台与样式 -> 生成任意场景封面 PNG</p>
       </div>
-      <div class="top-actions">
-        <button id="modeSingle" class="mode active" type="button">单图</button>
-        <button id="modeBatch" class="mode" type="button">批量候选</button>
-      </div>
+      <label class="top-actions multi-toggle">
+        <input id="multiPlatformToggle" type="checkbox">
+        <span class="switch-track" aria-hidden="true"><span></span></span>
+        <span>多平台预览</span>
+      </label>
     </header>
 
     <section class="layout">
@@ -130,7 +131,7 @@
         </div>
         <div class="batch-head">
           <span>候选封面</span>
-          <span id="batchMeta">当前平台的不同风格候选，点击可应用</span>
+          <span id="batchMeta">当前平台候选预览，点击应用到主图</span>
         </div>
         <div id="variantGrid" class="variant-grid"></div>
       </section>

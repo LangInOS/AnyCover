@@ -146,8 +146,7 @@ function bindEvents() {
     render();
     refreshVariants();
   });
-  $('modeSingle').addEventListener('click', () => setMode('single'));
-  $('modeBatch').addEventListener('click', () => setMode('batch'));
+  $('multiPlatformToggle').addEventListener('change', (event) => setMultiPlatform(event.target.checked));
   $('exportBtn').addEventListener('click', exportPng);
   $('randomStyleBtn').addEventListener('click', randomStyle);
   $('generateBatchBtn').addEventListener('click', generateVariants);
@@ -166,16 +165,14 @@ function bindEvents() {
   });
 }
 
-function setMode(mode) {
-  state.mode = mode;
-  $('modeSingle').classList.toggle('active', mode === 'single');
-  $('modeBatch').classList.toggle('active', mode === 'batch');
+function setMultiPlatform(enabled) {
+  state.mode = enabled ? 'batch' : 'single';
   setBatchMeta();
   refreshVariants();
 }
 
 function setBatchMeta(text) {
-  $('batchMeta').textContent = text || (state.mode === 'batch' ? '同一文案生成 8 张平台/风格候选，点击应用' : '当前平台的不同风格候选，点击可应用');
+  $('batchMeta').textContent = text || (state.mode === 'batch' ? '多平台候选预览，点击应用到主图' : '当前平台候选预览，点击应用到主图');
 }
 
 function refreshVariants() {
@@ -185,7 +182,7 @@ function refreshVariants() {
 function generateVariants() {
   state.variantSeed += 1;
   makeVariants(state.mode === 'batch' ? 8 : 5, true);
-  setBatchMeta(state.mode === 'batch' ? '已换一组跨平台候选，点击应用' : '已换一组当前平台候选，点击应用');
+  setBatchMeta(state.mode === 'batch' ? '已换一组多平台候选，点击应用' : '已换一组当前平台候选，点击应用');
 }
 
 function setActivePalette() {
@@ -642,25 +639,15 @@ function makeVariants(count, shuffle = false) {
     item.type = 'button';
     item.className = `variant${index === 0 ? ' active' : ''}`;
     const thumb = document.createElement('canvas');
-    const thumbPlatform = makeThumbPlatform(variant.platform);
-    thumb.width = thumbPlatform.width;
-    thumb.height = thumbPlatform.height;
-    drawCover(thumb.getContext('2d'), thumbPlatform, variant.palette, variant.template, variant.pattern, variant.input);
+    thumb.width = variant.platform.width;
+    thumb.height = variant.platform.height;
+    drawCover(thumb.getContext('2d'), variant.platform, variant.palette, variant.template, variant.pattern, variant.input);
     const label = document.createElement('span');
     label.textContent = `${variant.platform.name} · ${variant.palette.name}`;
     item.append(thumb, label);
     item.addEventListener('click', () => applyVariant(index));
     grid.appendChild(item);
   });
-}
-
-function makeThumbPlatform(platform) {
-  const longEdge = 260;
-  const ratio = platform.width / platform.height;
-  if (ratio >= 1) {
-    return { ...platform, width: longEdge, height: Math.round(longEdge / ratio) };
-  }
-  return { ...platform, width: Math.round(longEdge * ratio), height: longEdge };
 }
 
 function applyVariant(index) {
