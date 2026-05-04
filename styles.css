@@ -391,6 +391,29 @@ button {
   margin-bottom: 14px;
 }
 
+.preview-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.grid-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.grid-toggle input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
 .preview-head span,
 .batch-head {
   font-size: 12px;
@@ -413,6 +436,17 @@ button {
   min-height: 286px;
   overflow: visible;
   padding: 2px 2px 4px;
+  border-radius: 10px;
+}
+
+.multi-preview-wall.show-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,.075) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.075) 1px, transparent 1px),
+    linear-gradient(rgba(106,178,148,.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(106,178,148,.12) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px;
+  background-position: 2px 2px;
 }
 
 .platform-preview-card {

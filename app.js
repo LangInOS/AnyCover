@@ -98,7 +98,8 @@ const state = {
   variantSeed: 0,
   variants: [],
   previewPositions: {},
-  previewZ: 1
+  previewZ: 1,
+  previewGrid: true
 };
 
 const $ = (id) => document.getElementById(id);
@@ -110,6 +111,7 @@ function init() {
   buildPaletteGrid();
   bindEvents();
   syncModeUI();
+  syncPreviewGrid();
   setBatchMeta();
   render();
   makeVariants(variantCount());
@@ -241,6 +243,10 @@ function bindEvents() {
     refreshVariants();
   });
   $('multiPlatformToggle').addEventListener('change', (event) => setMultiPlatform(event.target.checked));
+  $('previewGridToggle').addEventListener('change', (event) => {
+    state.previewGrid = event.target.checked;
+    syncPreviewGrid();
+  });
   $('exportBtn').addEventListener('click', exportPng);
   $('randomStyleBtn').addEventListener('click', randomStyle);
   $('generateBatchBtn').addEventListener('click', generateVariants);
@@ -259,6 +265,11 @@ function bindEvents() {
     render();
     refreshVariants();
   });
+}
+
+function syncPreviewGrid() {
+  $('multiPreviewWall').classList.toggle('show-grid', state.previewGrid);
+  $('previewGridToggle').checked = state.previewGrid;
 }
 
 function setMultiPlatform(enabled) {

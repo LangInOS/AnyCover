@@ -131,7 +131,13 @@
       <section class="panel preview-panel">
         <div class="preview-head">
           <h2 id="previewTitle">多平台预览</h2>
-          <span id="previewMeta">X 封面 · 2500x1000</span>
+          <div class="preview-tools">
+            <label class="grid-toggle">
+              <input id="previewGridToggle" type="checkbox" checked>
+              <span>背景网格</span>
+            </label>
+            <span id="previewMeta">X 封面 · 2500x1000</span>
+          </div>
         </div>
         <div id="multiPreviewWall" class="multi-preview-wall"></div>
         <div id="singlePreview" class="single-preview canvas-stage">
@@ -146,6 +152,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260504-drag-preview-wall-2"></script>
+  <script src="app.js?v=20260504-preview-wall-grid"></script>
 </body>
 </html>
