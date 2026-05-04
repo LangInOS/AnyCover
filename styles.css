@@ -37,11 +37,26 @@ button, input, select, textarea { font: inherit; }
   margin-bottom: 12px;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand img {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.32), 0 0 0 1px rgba(255,255,255,.06);
+}
+
 h1 {
   margin: 0 0 6px;
-  font-size: 24px;
+  font-size: 25px;
   line-height: 1;
-  letter-spacing: .01em;
+  letter-spacing: .02em;
 }
 
 p {
@@ -421,6 +436,7 @@ button {
 @media (max-width: 700px) {
   .wrap { width: min(100vw - 24px, 620px); padding-top: 16px; }
   .topbar { display: block; }
+  .brand img { width: 40px; height: 40px; }
   .top-actions { margin-top: 16px; width: 100%; }
   .layout { grid-template-columns: 1fr; }
   .preview-panel { grid-column: auto; }

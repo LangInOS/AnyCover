@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="AnyCover">
+  <defs>
+    <linearGradient id="g" x1="18" y1="18" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0ead8"/>
+      <stop offset=".46" stop-color="#6ab294"/>
+      <stop offset="1" stop-color="#26302b"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="23" y1="25" x2="104" y2="103" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".78"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".08"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#0d0d0c"/>
+  <path d="M26 38c0-7.2 5.8-13 13-13h44.6c5 0 9.6 2.9 11.8 7.4L108 58.2V91c0 7.2-5.8 13-13 13H39c-7.2 0-13-5.8-13-13V38Z" fill="url(#g)"/>
+  <path d="M83.8 25v22.7c0 5.8 4.7 10.5 10.5 10.5H108" fill="#0d0d0c" opacity=".34"/>
+  <path d="M34 42c0-5 4-9 9-9h39.7c3.4 0 6.5 1.9 8.1 4.9L100 55.4V88c0 5-4 9-9 9H43c-5 0-9-4-9-9V42Z" fill="none" stroke="url(#edge)" stroke-width="2"/>
+  <path d="M48 85 64 43l16 42h-9l-2.7-8.2H59.2L56.4 85H48Zm13.8-16.4h4l-2-6.2-2 6.2Z" fill="#0d0d0c"/>
+  <path d="M47 84 63 42l16 42h-9l-2.7-8.2H58.2L55.4 84H47Zm13.8-16.4h4l-2-6.2-2 6.2Z" fill="#f2eddf"/>
+  <path d="M88 31.5 102 55H91.4c-1.9 0-3.4-1.5-3.4-3.4V31.5Z" fill="#f2eddf" opacity=".82"/>
+</svg>
