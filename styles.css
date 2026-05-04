@@ -426,11 +426,17 @@ button {
   border-radius: 10px;
   background: #10100f;
   overflow: hidden;
-  cursor: pointer;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
   transition: border-color .16s ease, transform .16s ease;
 }
 
 .platform-preview-card.focused { border-color: var(--accent); }
+.platform-preview-card.dragging {
+  cursor: grabbing;
+  transition: border-color .16s ease;
+}
 
 .platform-preview-card header {
   display: flex;

@@ -96,7 +96,9 @@ const state = {
   palette: palettes[0],
   palettePage: 0,
   variantSeed: 0,
-  variants: []
+  variants: [],
+  previewPositions: {},
+  previewZ: 1
 };
 
 const $ = (id) => document.getElementById(id);
@@ -283,7 +285,7 @@ function syncModeUI() {
 }
 
 function setBatchMeta(text) {
-  $('batchMeta').textContent = text || (state.mode === 'batch' ? '一组风格同时应用到所有已选平台' : '当前平台候选预览，点击应用到主图');
+  $('batchMeta').textContent = text || (state.mode === 'batch' ? '拖动上方预览卡片可手动组合' : '当前平台候选预览，点击应用到主图');
 }
 
 function refreshVariants() {
@@ -379,11 +381,16 @@ function renderMultiPreview(input = getInput(), palette = state.palette, pattern
     drawCover(previewCanvas.getContext('2d'), platform, palette, templateForPlatform(platform, index), pattern, input);
     card.appendChild(previewCanvas);
     card.addEventListener('click', () => {
+      if (card.dataset.dragged === 'true') {
+        card.dataset.dragged = 'false';
+        return;
+      }
       state.platform = platform;
       syncTemplateSelect();
       syncPlatformGrid();
       render();
     });
+    enablePreviewDrag(card, wall);
     wall.appendChild(card);
   });
   requestAnimationFrame(layoutMultiPreview);
@@ -405,20 +412,20 @@ function layoutMultiPreview() {
   }
   const width = wall.clientWidth;
   const gap = 10;
-  const columns = width < 520 ? 4 : 8;
+  const columns = width < 520 ? 6 : 12;
   const columnWidth = (width - gap * (columns - 1)) / columns;
   const heights = Array(columns).fill(0);
-  if (layoutShowcasePreview(wall, cards, width, gap)) return;
 
   const placements = cards.map((card) => {
     const canvas = card.querySelector('canvas');
     const ratio = canvas.width / canvas.height;
-    const span = ratio < .9 ? Math.max(1, Math.floor(columns / 4)) : Math.max(2, Math.floor(columns / 2));
+    const span = ratio < .95 ? Math.max(2, Math.floor(columns / 6)) : Math.max(3, Math.floor(columns / 2));
     const cardWidth = columnWidth * span + gap * (span - 1);
     const headerHeight = 32;
     const cardHeight = Math.round(cardWidth / ratio + headerHeight);
-    return { card, ratio, span, cardWidth, cardHeight };
-  }).sort((a, b) => b.cardHeight - a.cardHeight);
+    const order = previewOrder(card.dataset.platformId);
+    return { card, ratio, span, cardWidth, cardHeight, order };
+  }).sort((a, b) => a.order - b.order);
 
   placements.forEach(({ card, span, cardWidth, cardHeight }) => {
     let bestColumn = 0;
@@ -445,54 +452,92 @@ function layoutMultiPreview() {
     const x = bestColumn * (columnWidth + gap);
     card.style.width = `${Math.floor(cardWidth)}px`;
     card.style.height = `${cardHeight}px`;
-    card.style.transform = `translate(${Math.floor(x)}px, ${Math.floor(bestY)}px)`;
+    setPreviewCardPosition(card, Math.floor(x), Math.floor(bestY), false);
 
     for (let column = bestColumn; column < bestColumn + span; column += 1) {
       heights[column] = bestY + cardHeight + gap;
     }
   });
 
-  wall.style.height = `${Math.max(...heights) + 2}px`;
+  cards.forEach((card) => {
+    const saved = state.previewPositions[card.dataset.platformId];
+    if (saved) setPreviewCardPosition(card, saved.x, saved.y, false, saved.z);
+  });
+  updatePreviewWallHeight(wall);
 }
 
-function layoutShowcasePreview(wall, cards, width, gap) {
-  const byId = new Map(cards.map((card) => [card.dataset.platformId, card]));
-  const ids = ['douyin', 'x', 'wechat', 'channels', 'youtube', 'xiaohongshu'];
-  if (width < 560 || !ids.every((id) => byId.has(id)) || cards.length !== ids.length) return false;
+function enablePreviewDrag(card, wall) {
+  card.addEventListener('pointerdown', (event) => {
+    if (state.mode !== 'batch') return;
+    event.preventDefault();
+    card.setPointerCapture(event.pointerId);
+    const start = getPreviewCardPosition(card);
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const z = state.previewZ += 1;
+    let moved = false;
+    card.classList.add('dragging');
+    card.style.zIndex = z;
 
-  const boardHeight = Math.round(width * .68);
-  const contentWidth = width - gap * 2;
-  const leftWidth = Math.round(contentWidth * .25);
-  const middleWidth = Math.round(contentWidth * .375);
-  const rightWidth = contentWidth - leftWidth - middleWidth;
-  const middleX = leftWidth + gap;
-  const rightX = middleX + middleWidth + gap;
-  const middleContentHeight = boardHeight - gap * 2;
-  const xHeight = Math.round(middleContentHeight * .31);
-  const wechatHeight = Math.round(middleContentHeight * .24);
-  const channelsHeight = middleContentHeight - xHeight - wechatHeight;
-  const youtubeHeight = Math.round((boardHeight - gap) * .39);
-  const xhsHeight = boardHeight - gap - youtubeHeight;
+    const move = (moveEvent) => {
+      const nextX = start.x + moveEvent.clientX - startX;
+      const nextY = start.y + moveEvent.clientY - startY;
+      if (Math.abs(nextX - start.x) > 3 || Math.abs(nextY - start.y) > 3) moved = true;
+      setPreviewCardPosition(card, nextX, nextY, true, z);
+      updatePreviewWallHeight(wall);
+    };
 
-  const boxes = {
-    douyin: [0, 0, leftWidth, boardHeight],
-    x: [middleX, 0, middleWidth, xHeight],
-    wechat: [middleX, xHeight + gap, middleWidth, wechatHeight],
-    channels: [middleX, xHeight + wechatHeight + gap * 2, middleWidth, channelsHeight],
-    youtube: [rightX, 0, rightWidth, youtubeHeight],
-    xiaohongshu: [rightX, youtubeHeight + gap, rightWidth, xhsHeight]
-  };
+    const end = () => {
+      card.classList.remove('dragging');
+      if (moved) card.dataset.dragged = 'true';
+      card.removeEventListener('pointermove', move);
+      card.removeEventListener('pointerup', end);
+      card.removeEventListener('pointercancel', end);
+    };
 
-  Object.entries(boxes).forEach(([id, box]) => {
-    const card = byId.get(id);
-    const [x, y, cardWidth, cardHeight] = box;
-    card.style.width = `${cardWidth}px`;
-    card.style.height = `${cardHeight}px`;
-    card.style.transform = `translate(${x}px, ${y}px)`;
+    card.addEventListener('pointermove', move);
+    card.addEventListener('pointerup', end);
+    card.addEventListener('pointercancel', end);
   });
+}
 
-  wall.style.height = `${boardHeight + 2}px`;
-  return true;
+function setPreviewCardPosition(card, x, y, save = false, z) {
+  const wall = $('multiPreviewWall');
+  const maxX = Math.max(0, wall.clientWidth - card.offsetWidth - 2);
+  const nextX = Math.max(0, Math.min(Math.round(x), maxX));
+  const nextY = Math.max(0, Math.round(y));
+  card.style.transform = `translate(${nextX}px, ${nextY}px)`;
+  if (z) card.style.zIndex = z;
+  if (save) {
+    state.previewPositions[card.dataset.platformId] = {
+      x: nextX,
+      y: nextY,
+      z: z || Number(card.style.zIndex || 1)
+    };
+  }
+}
+
+function getPreviewCardPosition(card) {
+  const match = /translate\(([-\d.]+)px,\s*([-\d.]+)px\)/.exec(card.style.transform);
+  return {
+    x: match ? Number(match[1]) : 0,
+    y: match ? Number(match[2]) : 0
+  };
+}
+
+function updatePreviewWallHeight(wall) {
+  const cards = [...wall.querySelectorAll('.platform-preview-card')];
+  const bottom = cards.reduce((max, card) => {
+    const position = getPreviewCardPosition(card);
+    return Math.max(max, position.y + card.offsetHeight);
+  }, 0);
+  wall.style.height = `${bottom + 2}px`;
+}
+
+function previewOrder(platformId) {
+  const order = ['x', 'youtube', 'wechat', 'channels', 'xiaohongshu', 'douyin'];
+  const index = order.indexOf(platformId);
+  return index === -1 ? order.length : index;
 }
 
 function fitMainCanvas(platform = state.platform) {
