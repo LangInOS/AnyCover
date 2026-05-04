@@ -419,7 +419,7 @@ function layoutMultiPreview() {
   const placements = cards.map((card) => {
     const canvas = card.querySelector('canvas');
     const ratio = canvas.width / canvas.height;
-    const span = ratio < .95 ? Math.max(2, Math.floor(columns / 6)) : Math.max(3, Math.floor(columns / 2));
+    const span = ratio < .95 ? Math.max(3, Math.floor(columns / 4)) : Math.max(3, Math.floor(columns / 2));
     const cardWidth = columnWidth * span + gap * (span - 1);
     const headerHeight = 32;
     const cardHeight = Math.round(cardWidth / ratio + headerHeight);
