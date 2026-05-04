@@ -87,8 +87,9 @@ const palettes = [
 const palettesPerPage = 12;
 
 const state = {
-  mode: 'single',
+  mode: 'batch',
   platform: platforms[0],
+  selectedPlatformIds: platforms.map((platform) => platform.id),
   template: horizontalTemplates[0],
   pattern: patterns[0],
   palette: palettes[0],
@@ -100,11 +101,13 @@ const state = {
 const $ = (id) => document.getElementById(id);
 
 function init() {
-  fillSelect('platformSelect', platforms);
+  buildPlatformGrid();
   syncTemplateSelect();
   fillSelect('patternSelect', patterns);
   buildPaletteGrid();
   bindEvents();
+  syncModeUI();
+  setBatchMeta();
   render();
   makeVariants(variantCount());
 }
@@ -126,6 +129,60 @@ function isVerticalPlatform(platform = state.platform) {
 
 function templatesForPlatform(platform = state.platform) {
   return isVerticalPlatform(platform) ? verticalTemplates : horizontalTemplates;
+}
+
+function selectedPlatforms() {
+  return platforms.filter((platform) => state.selectedPlatformIds.includes(platform.id));
+}
+
+function templateForPlatform(platform, offset = 0) {
+  const templates = templatesForPlatform(platform);
+  if (templates.includes(state.template)) return state.template;
+  return templates[offset % templates.length];
+}
+
+function buildPlatformGrid() {
+  const grid = $('platformGrid');
+  grid.innerHTML = '';
+  platforms.forEach((platform) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'platform-chip';
+    chip.dataset.id = platform.id;
+    chip.innerHTML = `<strong>${platform.name}</strong><small>${platform.width}x${platform.height} · ${platform.ratio}</small>`;
+    chip.addEventListener('click', () => handlePlatformClick(platform));
+    grid.appendChild(chip);
+  });
+  syncPlatformGrid();
+}
+
+function handlePlatformClick(platform) {
+  state.platform = platform;
+  if (state.mode === 'batch') {
+    const selected = new Set(state.selectedPlatformIds);
+    if (selected.has(platform.id) && selected.size > 1) selected.delete(platform.id);
+    else selected.add(platform.id);
+    state.selectedPlatformIds = platforms.filter((item) => selected.has(item.id)).map((item) => item.id);
+    if (!state.selectedPlatformIds.includes(state.platform.id)) {
+      state.platform = platforms.find((item) => item.id === state.selectedPlatformIds[0]);
+    }
+  } else {
+    state.selectedPlatformIds = [platform.id];
+  }
+  syncTemplateSelect();
+  syncPlatformGrid();
+  render();
+  refreshVariants();
+}
+
+function syncPlatformGrid() {
+  document.querySelectorAll('.platform-chip').forEach((chip) => {
+    const selected = state.mode === 'batch'
+      ? state.selectedPlatformIds.includes(chip.dataset.id)
+      : chip.dataset.id === state.platform.id;
+    chip.classList.toggle('selected', selected);
+    chip.classList.toggle('focused', chip.dataset.id === state.platform.id);
+  });
 }
 
 function syncTemplateSelect() {
@@ -165,13 +222,10 @@ function getVisiblePalettes() {
 
 function bindEvents() {
   ['tagInput', 'leadInput', 'titleInput', 'watermarkInput', 'signInput', 'patternStrength', 'fontSizeInput'].forEach((id) => {
-    $(id).addEventListener('input', render);
-  });
-  $('platformSelect').addEventListener('change', (event) => {
-    state.platform = platforms.find((item) => item.id === event.target.value);
-    syncTemplateSelect();
-    render();
-    refreshVariants();
+    $(id).addEventListener('input', () => {
+      render();
+      refreshVariants();
+    });
   });
   $('templateSelect').addEventListener('change', (event) => {
     state.template = templatesForPlatform().find((item) => item.id === event.target.value);
@@ -194,22 +248,41 @@ function bindEvents() {
   $('clearHighlightBtn').addEventListener('click', () => {
     $('titleInput').value = $('titleInput').value.replaceAll('`', '');
     render();
+    refreshVariants();
   });
   $('randomWatermarkBtn').addEventListener('click', randomWatermark);
   $('clearWatermarkBtn').addEventListener('click', () => {
     $('watermarkInput').value = '';
     render();
+    refreshVariants();
   });
 }
 
 function setMultiPlatform(enabled) {
   state.mode = enabled ? 'batch' : 'single';
+  if (!enabled) state.selectedPlatformIds = [state.platform.id];
+  else if (state.selectedPlatformIds.length < 2) state.selectedPlatformIds = platforms.map((platform) => platform.id);
+  syncModeUI();
+  syncPlatformGrid();
+  syncTemplateSelect();
+  render();
   setBatchMeta();
   refreshVariants();
 }
 
+function syncModeUI() {
+  const enabled = state.mode === 'batch';
+  $('multiPlatformToggle').checked = enabled;
+  $('previewTitle').textContent = enabled ? '多平台预览' : '单平台精修';
+  $('batchTitle').textContent = enabled ? '套装候选' : '候选封面';
+  $('platformModeHint').textContent = enabled ? '默认全选，可取消不需要的平台' : '选择一个平台精修';
+  $('exportBtn').textContent = enabled ? '导出焦点 PNG' : '导出 PNG';
+  document.querySelector('.preview-panel').classList.toggle('is-batch', enabled);
+  document.querySelector('.preview-panel').classList.toggle('is-single', !enabled);
+}
+
 function setBatchMeta(text) {
-  $('batchMeta').textContent = text || (state.mode === 'batch' ? '多平台候选预览，点击应用到主图' : '当前平台候选预览，点击应用到主图');
+  $('batchMeta').textContent = text || (state.mode === 'batch' ? '一组风格同时应用到所有已选平台' : '当前平台候选预览，点击应用到主图');
 }
 
 function refreshVariants() {
@@ -223,7 +296,7 @@ function generateVariants() {
 }
 
 function variantCount() {
-  return state.mode === 'batch' ? 12 : 8;
+  return state.mode === 'batch' ? 6 : 8;
 }
 
 function setActivePalette() {
@@ -282,7 +355,42 @@ function render(config = {}) {
   canvas.height = platform.height;
   drawCover(ctx, platform, palette, template, pattern, input);
   fitMainCanvas(platform);
-  $('previewMeta').textContent = `${platform.name} · ${platform.width}x${platform.height}`;
+  if (state.mode === 'batch') {
+    renderMultiPreview(input, palette, pattern);
+    $('previewMeta').textContent = `${selectedPlatforms().length} 个平台 · 同步生成`;
+  } else {
+    $('previewMeta').textContent = `${platform.name} · ${platform.width}x${platform.height}`;
+  }
+}
+
+function renderMultiPreview(input = getInput(), palette = state.palette, pattern = state.pattern) {
+  const wall = $('multiPreviewWall');
+  wall.innerHTML = '';
+  selectedPlatforms().forEach((platform, index) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = `platform-preview-card ${previewShapeClass(platform)}${platform.id === state.platform.id ? ' focused' : ''}`;
+    card.innerHTML = `<header><strong>${platform.name}</strong><span>${platform.width}x${platform.height}</span></header>`;
+    const previewCanvas = document.createElement('canvas');
+    previewCanvas.width = platform.width;
+    previewCanvas.height = platform.height;
+    drawCover(previewCanvas.getContext('2d'), platform, palette, templateForPlatform(platform, index), pattern, input);
+    card.appendChild(previewCanvas);
+    card.addEventListener('click', () => {
+      state.platform = platform;
+      syncTemplateSelect();
+      syncPlatformGrid();
+      render();
+    });
+    wall.appendChild(card);
+  });
+}
+
+function previewShapeClass(platform) {
+  const ratio = platform.width / platform.height;
+  if (ratio < .9) return 'vertical';
+  if (ratio > 2.1) return 'ultrawide';
+  return 'wide';
 }
 
 function fitMainCanvas(platform = state.platform) {
@@ -645,6 +753,7 @@ function randomHighlight() {
   const highlight = chars.slice(start, start + length).join('');
   $('titleInput').value = `${chars.slice(0, start).join('')}\`${highlight}\`${chars.slice(start + length).join('')}`;
   render();
+  refreshVariants();
 }
 
 function randomWatermark() {
@@ -653,9 +762,14 @@ function randomWatermark() {
   if (!candidates.length) return;
   $('watermarkInput').value = candidates[Math.floor(Math.random() * candidates.length)];
   render();
+  refreshVariants();
 }
 
 function makeVariants(count, shuffle = false) {
+  if (state.mode === 'batch') {
+    makeSuiteVariants(count, shuffle);
+    return;
+  }
   const grid = $('variantGrid');
   grid.innerHTML = '';
   const paletteStart = palettes.indexOf(state.palette);
@@ -664,7 +778,7 @@ function makeVariants(count, shuffle = false) {
   const templateStart = currentTemplates.indexOf(state.template);
   const offset = shuffle ? state.variantSeed : 0;
   state.variants = Array.from({ length: count }, (_, index) => {
-    const platform = state.mode === 'batch' ? platforms[(index + offset) % platforms.length] : state.platform;
+    const platform = state.platform;
     const platformTemplates = templatesForPlatform(platform);
     return {
       platform,
@@ -694,16 +808,64 @@ function makeVariants(count, shuffle = false) {
   });
 }
 
+function makeSuiteVariants(count, shuffle = false) {
+  const grid = $('variantGrid');
+  grid.innerHTML = '';
+  const chosenPlatforms = selectedPlatforms();
+  const paletteStart = palettes.indexOf(state.palette);
+  const patternStart = patterns.indexOf(state.pattern);
+  const offset = shuffle ? state.variantSeed : 0;
+  state.variants = Array.from({ length: count }, (_, index) => ({
+    palette: palettes[(paletteStart + index * 3 + offset) % palettes.length],
+    pattern: patterns[(patternStart + index + offset) % patterns.length],
+    templateOffset: index + offset,
+    input: { ...getInput(), size: Math.max(82, Number($('fontSizeInput').value) + ((index + offset) % 5 - 2) * 7), strength: .18 + ((index + offset) % 5) * .1 }
+  }));
+
+  state.variants.forEach((variant, index) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = `variant suite-variant${index === 0 ? ' active' : ''}`;
+    const stack = document.createElement('div');
+    stack.className = 'suite-stack';
+    chosenPlatforms.forEach((platform, platformIndex) => {
+      const thumb = document.createElement('canvas');
+      thumb.width = platform.width;
+      thumb.height = platform.height;
+      if (isVerticalPlatform(platform)) thumb.className = 'vertical-mini';
+      drawCover(thumb.getContext('2d'), platform, variant.palette, templateForPlatform(platform, variant.templateOffset + platformIndex), variant.pattern, variant.input);
+      stack.appendChild(thumb);
+    });
+    const label = document.createElement('span');
+    label.textContent = `方案 ${index + 1} · ${variant.palette.name}`;
+    item.append(stack, label);
+    item.addEventListener('click', () => applySuiteVariant(index));
+    grid.appendChild(item);
+  });
+}
+
 function applyVariant(index) {
   const variant = state.variants[index];
   state.platform = variant.platform;
   state.palette = variant.palette;
   state.pattern = variant.pattern;
   state.template = variant.template;
-  $('platformSelect').value = state.platform.id;
   syncTemplateSelect();
+  syncPlatformGrid();
   $('patternSelect').value = state.pattern.id;
   $('templateSelect').value = state.template.id;
+  $('fontSizeInput').value = variant.input.size;
+  $('patternStrength').value = Math.round(variant.input.strength * 100);
+  showPaletteGroupForCurrent();
+  document.querySelectorAll('.variant').forEach((item, itemIndex) => item.classList.toggle('active', itemIndex === index));
+  render({ input: variant.input });
+}
+
+function applySuiteVariant(index) {
+  const variant = state.variants[index];
+  state.palette = variant.palette;
+  state.pattern = variant.pattern;
+  $('patternSelect').value = state.pattern.id;
   $('fontSizeInput').value = variant.input.size;
   $('patternStrength').value = Math.round(variant.input.strength * 100);
   showPaletteGroupForCurrent();

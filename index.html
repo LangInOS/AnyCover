@@ -18,9 +18,9 @@
         </div>
       </div>
       <label class="top-actions multi-toggle">
-        <input id="multiPlatformToggle" type="checkbox">
+        <input id="multiPlatformToggle" type="checkbox" checked>
         <span class="switch-track" aria-hidden="true"><span></span></span>
-        <span>多平台预览</span>
+        <span>多平台套装</span>
       </label>
     </header>
 
@@ -60,10 +60,13 @@
 
       <aside class="panel style-panel">
         <h2>样式</h2>
-        <label>
-          平台尺寸
-          <select id="platformSelect"></select>
-        </label>
+        <div class="field">
+          <div class="field-label-row">
+            <span>发布平台</span>
+            <span id="platformModeHint" class="mode-hint">默认全选，可取消不需要的平台</span>
+          </div>
+          <div id="platformGrid" class="platform-grid"></div>
+        </div>
         <label>
           版式模板
           <select id="templateSelect"></select>
@@ -127,14 +130,15 @@
 
       <section class="panel preview-panel">
         <div class="preview-head">
-          <h2>预览</h2>
+          <h2 id="previewTitle">多平台预览</h2>
           <span id="previewMeta">X 封面 · 2500x1000</span>
         </div>
-        <div class="canvas-stage">
+        <div id="multiPreviewWall" class="multi-preview-wall"></div>
+        <div id="singlePreview" class="single-preview canvas-stage">
           <canvas id="coverCanvas" width="2500" height="1000"></canvas>
         </div>
         <div class="batch-head">
-          <span>候选封面</span>
+          <span id="batchTitle">套装候选</span>
           <span id="batchMeta">当前平台候选预览，点击应用到主图</span>
         </div>
         <div id="variantGrid" class="variant-grid"></div>
@@ -142,6 +146,6 @@
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=20260504-multiplatform"></script>
 </body>
 </html>
