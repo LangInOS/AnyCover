@@ -426,14 +426,15 @@ function layoutMultiPreview() {
   const columns = width < 520 ? 6 : 12;
   const columnWidth = (width - gap * (columns - 1)) / columns;
   const heights = Array(columns).fill(0);
+  const headerHeight = 34;
 
   const placements = cards.map((card) => {
     const canvas = card.querySelector('canvas');
     const ratio = canvas.width / canvas.height;
-    const span = ratio < .95 ? Math.max(3, Math.floor(columns / 4)) : Math.max(3, Math.floor(columns / 2));
+    const span = ratio < .95 ? Math.max(3, Math.floor(columns / 4)) : Math.max(4, Math.floor(columns / 2));
     const cardWidth = columnWidth * span + gap * (span - 1);
-    const headerHeight = 32;
-    const cardHeight = Math.round(cardWidth / ratio + headerHeight);
+    const contentHeight = Math.round(cardWidth / ratio);
+    const cardHeight = contentHeight + headerHeight;
     const order = previewOrder(card.dataset.platformId);
     return { card, ratio, span, cardWidth, cardHeight, order };
   }).sort((a, b) => a.order - b.order);
