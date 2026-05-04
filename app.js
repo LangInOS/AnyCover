@@ -5,6 +5,7 @@ const platforms = [
   { id: 'x', name: 'X 封面', width: 2500, height: 1000, ratio: '5:2' },
   { id: 'youtube', name: 'YouTube 缩略图', width: 1280, height: 720, ratio: '16:9' },
   { id: 'wechat', name: '公众号首图', width: 900, height: 383, ratio: '2.35:1' },
+  { id: 'channels', name: '视频号竖版', width: 1080, height: 1260, ratio: '6:7' },
   { id: 'xiaohongshu', name: '小红书竖版', width: 1080, height: 1440, ratio: '3:4' },
   { id: 'douyin', name: '抖音/竖屏', width: 1080, height: 1920, ratio: '9:16' }
 ];

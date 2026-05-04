@@ -443,8 +443,17 @@ button {
 }
 
 .platform-preview-card header strong {
+  min-width: 0;
   color: var(--text);
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.platform-preview-card header span {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .platform-preview-card canvas {
