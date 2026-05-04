@@ -409,33 +409,27 @@ button {
 }
 
 .multi-preview-wall {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-auto-rows: 8px;
-  grid-auto-flow: dense;
-  gap: 10px;
+  position: relative;
   min-height: 286px;
   overflow: visible;
   padding: 2px 2px 4px;
-  align-items: start;
 }
 
 .platform-preview-card {
+  position: absolute;
+  left: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
-  grid-column: span 3;
-  grid-row: span 12;
-  height: 100%;
   min-height: 0;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #10100f;
   overflow: hidden;
   cursor: pointer;
+  transition: border-color .16s ease, transform .16s ease;
 }
 
-.platform-preview-card.vertical { grid-column: span 2; grid-row: span 20; }
-.platform-preview-card.ultrawide { grid-column: span 3; grid-row: span 10; }
 .platform-preview-card.focused { border-color: var(--accent); }
 
 .platform-preview-card header {
@@ -583,10 +577,6 @@ button {
   .layout { grid-template-columns: 1fr; }
   .preview-panel { grid-column: auto; }
   .platform-grid { grid-template-columns: 1fr; }
-  .multi-preview-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: none; }
-  .platform-preview-card,
-  .platform-preview-card.vertical,
-  .platform-preview-card.ultrawide { grid-column: span 2; }
   .variant-grid { grid-template-columns: repeat(2, 1fr); }
   .canvas-stage { height: 360px; }
 }

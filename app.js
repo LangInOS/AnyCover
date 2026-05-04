@@ -384,6 +384,7 @@ function renderMultiPreview(input = getInput(), palette = state.palette, pattern
     });
     wall.appendChild(card);
   });
+  requestAnimationFrame(layoutMultiPreview);
 }
 
 function previewShapeClass(platform) {
@@ -391,6 +392,50 @@ function previewShapeClass(platform) {
   if (ratio < .9) return 'vertical';
   if (ratio > 2.1) return 'ultrawide';
   return 'wide';
+}
+
+function layoutMultiPreview() {
+  const wall = $('multiPreviewWall');
+  const cards = [...wall.querySelectorAll('.platform-preview-card')];
+  if (!cards.length) {
+    wall.style.height = '0px';
+    return;
+  }
+  const width = wall.clientWidth;
+  const gap = 10;
+  const columns = width < 520 ? 4 : 8;
+  const columnWidth = (width - gap * (columns - 1)) / columns;
+  const heights = Array(columns).fill(0);
+
+  cards.forEach((card) => {
+    const canvas = card.querySelector('canvas');
+    const ratio = canvas.width / canvas.height;
+    const span = ratio < .9 ? Math.max(1, Math.floor(columns / 4)) : Math.max(2, Math.floor(columns / 2));
+    const cardWidth = columnWidth * span + gap * (span - 1);
+    const headerHeight = 32;
+    const cardHeight = Math.round(cardWidth / ratio + headerHeight);
+    let bestColumn = 0;
+    let bestY = Infinity;
+
+    for (let column = 0; column <= columns - span; column += 1) {
+      const y = Math.max(...heights.slice(column, column + span));
+      if (y < bestY) {
+        bestY = y;
+        bestColumn = column;
+      }
+    }
+
+    const x = bestColumn * (columnWidth + gap);
+    card.style.width = `${Math.floor(cardWidth)}px`;
+    card.style.height = `${cardHeight}px`;
+    card.style.transform = `translate(${Math.floor(x)}px, ${Math.floor(bestY)}px)`;
+
+    for (let column = bestColumn; column < bestColumn + span; column += 1) {
+      heights[column] = bestY + cardHeight + gap;
+    }
+  });
+
+  wall.style.height = `${Math.max(...heights) + 2}px`;
 }
 
 function fitMainCanvas(platform = state.platform) {
@@ -403,7 +448,10 @@ function fitMainCanvas(platform = state.platform) {
   canvas.style.height = `${Math.floor(platform.height * scale)}px`;
 }
 
-window.addEventListener('resize', () => fitMainCanvas(state.platform));
+window.addEventListener('resize', () => {
+  fitMainCanvas(state.platform);
+  if (state.mode === 'batch') layoutMultiPreview();
+});
 
 function drawCover(target, platform, palette, template, pattern, input) {
   const w = platform.width;
