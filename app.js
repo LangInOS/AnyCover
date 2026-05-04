@@ -371,6 +371,7 @@ function renderMultiPreview(input = getInput(), palette = state.palette, pattern
     const card = document.createElement('button');
     card.type = 'button';
     card.className = `platform-preview-card ${previewShapeClass(platform)}${platform.id === state.platform.id ? ' focused' : ''}`;
+    card.dataset.platformId = platform.id;
     card.innerHTML = `<header><strong>${platform.name}</strong><span>${platform.width}x${platform.height}</span></header>`;
     const previewCanvas = document.createElement('canvas');
     previewCanvas.width = platform.width;
@@ -407,20 +408,35 @@ function layoutMultiPreview() {
   const columns = width < 520 ? 4 : 8;
   const columnWidth = (width - gap * (columns - 1)) / columns;
   const heights = Array(columns).fill(0);
+  if (layoutShowcasePreview(wall, cards, width, gap)) return;
 
-  cards.forEach((card) => {
+  const placements = cards.map((card) => {
     const canvas = card.querySelector('canvas');
     const ratio = canvas.width / canvas.height;
     const span = ratio < .9 ? Math.max(1, Math.floor(columns / 4)) : Math.max(2, Math.floor(columns / 2));
     const cardWidth = columnWidth * span + gap * (span - 1);
     const headerHeight = 32;
     const cardHeight = Math.round(cardWidth / ratio + headerHeight);
+    return { card, ratio, span, cardWidth, cardHeight };
+  }).sort((a, b) => b.cardHeight - a.cardHeight);
+
+  placements.forEach(({ card, span, cardWidth, cardHeight }) => {
     let bestColumn = 0;
-    let bestY = Infinity;
+    let bestScore = Infinity;
+    let bestY = 0;
 
     for (let column = 0; column <= columns - span; column += 1) {
       const y = Math.max(...heights.slice(column, column + span));
-      if (y < bestY) {
+      const nextHeights = [...heights];
+      for (let nextColumn = column; nextColumn < column + span; nextColumn += 1) {
+        nextHeights[nextColumn] = y + cardHeight + gap;
+      }
+      const maxHeight = Math.max(...nextHeights);
+      const minHeight = Math.min(...nextHeights);
+      const imbalance = maxHeight - minHeight;
+      const score = maxHeight * 10 + imbalance + y * .2;
+      if (score < bestScore) {
+        bestScore = score;
         bestY = y;
         bestColumn = column;
       }
@@ -437,6 +453,46 @@ function layoutMultiPreview() {
   });
 
   wall.style.height = `${Math.max(...heights) + 2}px`;
+}
+
+function layoutShowcasePreview(wall, cards, width, gap) {
+  const byId = new Map(cards.map((card) => [card.dataset.platformId, card]));
+  const ids = ['douyin', 'x', 'wechat', 'channels', 'youtube', 'xiaohongshu'];
+  if (width < 560 || !ids.every((id) => byId.has(id)) || cards.length !== ids.length) return false;
+
+  const boardHeight = Math.round(width * .68);
+  const contentWidth = width - gap * 2;
+  const leftWidth = Math.round(contentWidth * .25);
+  const middleWidth = Math.round(contentWidth * .375);
+  const rightWidth = contentWidth - leftWidth - middleWidth;
+  const middleX = leftWidth + gap;
+  const rightX = middleX + middleWidth + gap;
+  const middleContentHeight = boardHeight - gap * 2;
+  const xHeight = Math.round(middleContentHeight * .31);
+  const wechatHeight = Math.round(middleContentHeight * .24);
+  const channelsHeight = middleContentHeight - xHeight - wechatHeight;
+  const youtubeHeight = Math.round((boardHeight - gap) * .39);
+  const xhsHeight = boardHeight - gap - youtubeHeight;
+
+  const boxes = {
+    douyin: [0, 0, leftWidth, boardHeight],
+    x: [middleX, 0, middleWidth, xHeight],
+    wechat: [middleX, xHeight + gap, middleWidth, wechatHeight],
+    channels: [middleX, xHeight + wechatHeight + gap * 2, middleWidth, channelsHeight],
+    youtube: [rightX, 0, rightWidth, youtubeHeight],
+    xiaohongshu: [rightX, youtubeHeight + gap, rightWidth, xhsHeight]
+  };
+
+  Object.entries(boxes).forEach(([id, box]) => {
+    const card = byId.get(id);
+    const [x, y, cardWidth, cardHeight] = box;
+    card.style.width = `${cardWidth}px`;
+    card.style.height = `${cardHeight}px`;
+    card.style.transform = `translate(${x}px, ${y}px)`;
+  });
+
+  wall.style.height = `${boardHeight + 2}px`;
+  return true;
 }
 
 function fitMainCanvas(platform = state.platform) {
