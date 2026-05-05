@@ -1,41 +1,78 @@
 # AnyCover
 
-AnyCover 是一个纯前端多平台封面生成器，参考极简 X/Twitter 封面生成器的核心流程，但重新设计为更朴素、克制、可扩展的多场景封面工具。
+Create a complete cover suite from one idea.
 
-## 功能
+AnyCover is a browser-based multi-platform cover generator for creators, builders, and writers who need polished visual assets without opening a design tool. Write one headline, tune the visual system once, and export platform-ready PNG covers for X, YouTube, WeChat, Douyin, Xiaohongshu, and more.
 
-- 文字输入、引导句、顶部标签、署名和背景水印字
-- 使用反引号标记高亮词：`我的\`AI工作流\``
-- 多平台尺寸切换：X 封面、小红书竖版、公众号首图、抖音/竖屏、YouTube 缩略图
-- 多种版式模板、暗色/浅色配色、细网格/点阵/斜线/标尺花纹
-- 单图 PNG 导出，Canvas 原生输出，无后端依赖
-- 批量模式生成 5-8 张不同平台、配色、构图的变体缩略图
+![AnyCover interface](assets/screenshots/anycover-showcase.png)
 
-## 使用
+## Why It Exists
 
-直接部署静态文件即可：
+Most cover tools optimize for a single canvas. AnyCover is designed for distribution: one message, multiple formats, consistent visual language, real export sizes.
+
+It helps turn a concise idea into a coordinated publishing kit that can travel across social platforms without manually rebuilding the same design again and again.
+
+## Features
+
+- Multi-platform generation from one copy set
+- True-size PNG export for every selected platform
+- Horizontal and vertical layout templates with independent control
+- Multi-platform preview wall with draggable and resizable cards
+- Cover candidates for quickly exploring palettes, patterns, and compositions
+- Highlight syntax with backticks, for example ``build a `better workflow` ``
+- Title font, size, palette, pattern, watermark, and signature controls
+- Static frontend only: no backend, account, or upload required
+
+## Supported Formats
+
+- X cover: 2500x1000
+- YouTube thumbnail: 1280x720
+- WeChat article cover: 900x383
+- WeChat Channels vertical cover: 1080x1260
+- Xiaohongshu vertical cover: 1080x1440
+- Douyin vertical cover: 1080x1920
+
+## Usage
+
+Open the app, write your copy, choose the platforms you want, tune the style, then export.
+
+The fastest workflow:
+
+1. Enter a label, lead line, headline, and signature.
+2. Wrap important words in backticks to highlight them.
+3. Keep multi-platform mode on to generate a full publishing suite.
+4. Adjust templates, title font, color palette, and background pattern.
+5. Export the selected cover or export all platform PNGs.
+
+## Run Locally
+
+AnyCover is a static app. You can serve the repository with any local static server.
+
+```bash
+python3 -m http.server 4173
+```
+
+Then open:
+
+```text
+http://localhost:4173/
+```
+
+You can also deploy the files directly to any static hosting provider.
+
+## Project Structure
 
 ```text
 index.html
 styles.css
 app.js
+assets/
 ```
 
-本地预览可直接打开 `index.html`，或用任意静态服务器托管当前目录。
+## Design Direction
 
-## 新增平台
+AnyCover uses a restrained dark workspace, quiet controls, and editorial cover compositions. The product is intentionally practical: fast enough for daily publishing, flexible enough for platform-specific output, and distinctive enough to make the multi-platform suite itself the core creative artifact.
 
-在 `app.js` 的 `platforms` 数组中新增配置：
+## License
 
-```js
-{ id: 'bilibili', name: 'B站封面', width: 1146, height: 717, ratio: '16:10' }
-```
-
-新增后平台下拉框和批量生成会自动使用该尺寸。竖版平台如需默认海报布局，可在 `platformSelect` 的 change 逻辑中加入对应 `id`。
-
-## 差异化说明
-
-- 原参考偏单一 X 封面工具，AnyCover 扩展为多平台封面工具。
-- 视觉保留暗色朴素、细花纹、少量强调色的耐看方向，但品牌、布局、控件层级和批量区域都重新设计。
-- 导出链路改为 Canvas 原生绘制，减少第三方依赖，更适合一键静态部署。
-- 新增批量变体和平台配置模型，后续扩展尺寸、配色、模板更直接。
+This project is open for exploration and iteration. Add a license before using it in a public commercial distribution.
