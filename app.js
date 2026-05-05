@@ -86,13 +86,14 @@ const palettes = [
 ];
 
 const palettesPerPage = 12;
+const defaultPattern = patterns.find((pattern) => pattern.id === 'corners') || patterns[0];
 
 const state = {
   mode: 'batch',
   platform: platforms[0],
   selectedPlatformIds: platforms.map((platform) => platform.id),
   template: horizontalTemplates[0],
-  pattern: patterns[0],
+  pattern: defaultPattern,
   palette: palettes[0],
   palettePage: 0,
   variantSeed: 0,
@@ -108,6 +109,7 @@ function init() {
   buildPlatformGrid();
   syncTemplateSelect();
   fillSelect('patternSelect', patterns);
+  $('patternSelect').value = state.pattern.id;
   buildPaletteGrid();
   bindEvents();
   syncModeUI();
