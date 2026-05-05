@@ -456,6 +456,7 @@ function layoutMultiPreview() {
   const columnWidth = (width - gap * (columns - 1)) / columns;
   const heights = Array(columns).fill(0);
   const headerHeight = 34;
+  const hasManualLayout = cards.some((card) => state.previewPositions[card.dataset.platformId]);
 
   const placements = cards.map((card) => {
     const canvas = card.querySelector('canvas');
@@ -465,10 +466,11 @@ function layoutMultiPreview() {
     const contentHeight = Math.round(cardWidth / ratio);
     const cardHeight = contentHeight + headerHeight;
     const order = previewOrder(card.dataset.platformId);
-    return { card, ratio, span, cardWidth, cardHeight, order };
+    return { card, ratio, span, cardWidth, cardHeight, order, x: 0, y: 0 };
   }).sort((a, b) => a.order - b.order);
 
-  placements.forEach(({ card, span, cardWidth, cardHeight }) => {
+  placements.forEach((placement) => {
+    const { span, cardHeight } = placement;
     let bestColumn = 0;
     let bestScore = Infinity;
     let bestY = 0;
@@ -491,20 +493,34 @@ function layoutMultiPreview() {
     }
 
     const x = bestColumn * (columnWidth + gap);
-    card.style.width = `${Math.floor(cardWidth)}px`;
-    card.style.height = `${cardHeight}px`;
-    setPreviewCardPosition(card, Math.floor(x), Math.floor(bestY), false);
+    placement.x = Math.floor(x);
+    placement.y = Math.floor(bestY);
 
     for (let column = bestColumn; column < bestColumn + span; column += 1) {
       heights[column] = bestY + cardHeight + gap;
     }
   });
 
-  cards.forEach((card) => {
+  const naturalHeight = Math.max(...heights) - gap;
+  const maxAutoHeight = previewAutoHeight(wall);
+  const scale = Math.min(1, maxAutoHeight / Math.max(1, naturalHeight));
+
+  placements.forEach(({ card, cardWidth, cardHeight, x, y }) => {
+    card.style.width = `${Math.floor(cardWidth * scale)}px`;
+    card.style.height = `${Math.floor(cardHeight * scale)}px`;
+    setPreviewCardPosition(card, Math.floor(x * scale), Math.floor(y * scale), false);
+  });
+
+  if (hasManualLayout) cards.forEach((card) => {
     const saved = state.previewPositions[card.dataset.platformId];
     if (saved) setPreviewCardPosition(card, saved.x, saved.y, false, saved.z);
   });
   updatePreviewWallHeight(wall);
+}
+
+function previewAutoHeight(wall) {
+  const top = wall.getBoundingClientRect().top;
+  return Math.max(220, window.innerHeight - top - 16);
 }
 
 function enablePreviewDrag(card, wall) {
@@ -530,7 +546,10 @@ function enablePreviewDrag(card, wall) {
 
     const end = () => {
       card.classList.remove('dragging');
-      if (moved) card.dataset.dragged = 'true';
+      if (moved) {
+        card.dataset.dragged = 'true';
+        wall.classList.add('manual-layout');
+      }
       card.removeEventListener('pointermove', move);
       card.removeEventListener('pointerup', end);
       card.removeEventListener('pointercancel', end);
