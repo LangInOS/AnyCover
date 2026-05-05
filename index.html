@@ -54,17 +54,19 @@
       </aside>
 
       <aside class="panel style-panel">
-        <h2>样式</h2>
+        <div class="panel-title-row">
+          <h2>样式</h2>
+          <label class="multi-toggle compact-mode-toggle">
+            <input id="multiPlatformToggle" type="checkbox" checked>
+            <span class="switch-track" aria-hidden="true"><span></span></span>
+            <span>多平台套装</span>
+          </label>
+        </div>
         <div class="field">
           <div class="field-label-row">
             <span>发布平台</span>
             <span id="platformModeHint" class="mode-hint">默认全选，可取消不需要的平台</span>
           </div>
-          <label class="top-actions multi-toggle platform-mode-toggle">
-            <input id="multiPlatformToggle" type="checkbox" checked>
-            <span class="switch-track" aria-hidden="true"><span></span></span>
-            <span>多平台套装</span>
-          </label>
           <div id="platformGrid" class="platform-grid"></div>
         </div>
         <label>
@@ -152,6 +154,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260505-platform-icons-fixed"></script>
+  <script src="app.js?v=20260505-platform-icons-align"></script>
 </body>
 </html>

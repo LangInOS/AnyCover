@@ -91,10 +91,34 @@ p {
   background: #141413;
 }
 
-.platform-mode-toggle {
+.panel-title-row {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  width: 100%;
-  margin: 8px 0 7px;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-title-row h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.compact-mode-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #121211;
+  font-size: 10px;
+  letter-spacing: 0;
 }
 
 .multi-toggle {
@@ -117,8 +141,8 @@ p {
 
 .switch-track {
   position: relative;
-  width: 34px;
-  height: 18px;
+  width: 30px;
+  height: 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: #0f0f0e;
@@ -128,8 +152,8 @@ p {
   position: absolute;
   left: 3px;
   top: 50%;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--muted);
   transform: translateY(-50%);
@@ -142,7 +166,7 @@ p {
 }
 
 .multi-toggle input:checked + .switch-track span {
-  transform: translate(15px, -50%);
+  transform: translate(14px, -50%);
   background: #08130f;
 }
 
@@ -169,6 +193,12 @@ p {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: .2em;
+}
+
+.panel .panel-title-row h2 {
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 label, .label-text, .field {
@@ -357,27 +387,41 @@ button {
 
 .platform-chip-main,
 .preview-platform-title {
-  display: flex;
+  display: inline-grid;
+  grid-template-columns: 14px minmax(0, auto);
   align-items: center;
   min-width: 0;
-  gap: 6px;
+  column-gap: 5px;
+  line-height: 16px;
 }
 
 .platform-icon {
   flex: 0 0 auto;
-  width: 16px;
-  height: 16px;
-  min-width: 16px;
-  max-width: 16px;
-  min-height: 16px;
-  max-height: 16px;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  max-width: 14px;
+  min-height: 14px;
+  max-height: 14px;
   display: block;
-  color: var(--accent);
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
+  align-self: center;
+  justify-self: center;
+  color: var(--accent) !important;
+  fill: none !important;
+  stroke: var(--accent) !important;
+  stroke-width: 1.85;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.platform-icon path,
+.platform-icon rect {
+  stroke: var(--accent);
+}
+
+.platform-icon path[fill="currentColor"] {
+  fill: var(--accent);
+  stroke: none;
 }
 
 .platform-chip strong {
@@ -529,12 +573,12 @@ button {
 }
 
 .platform-preview-card .platform-icon {
-  width: 14px;
-  height: 14px;
-  min-width: 14px;
-  max-width: 14px;
-  min-height: 14px;
-  max-height: 14px;
+  width: 13px;
+  height: 13px;
+  min-width: 13px;
+  max-width: 13px;
+  min-height: 13px;
+  max-height: 13px;
 }
 
 .platform-preview-card header span {
