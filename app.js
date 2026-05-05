@@ -106,7 +106,8 @@ const state = {
   mode: 'batch',
   platform: platforms[0],
   selectedPlatformIds: platforms.map((platform) => platform.id),
-  template: horizontalTemplates[0],
+  horizontalTemplate: horizontalTemplates[0],
+  verticalTemplate: verticalTemplates[0],
   pattern: defaultPattern,
   titleFont: titleFonts[0],
   palette: palettes[0],
@@ -179,9 +180,12 @@ function selectedPlatforms() {
   return platforms.filter((platform) => state.selectedPlatformIds.includes(platform.id));
 }
 
-function templateForPlatform(platform, offset = 0) {
+function templateForPlatform(platform) {
+  return isVerticalPlatform(platform) ? state.verticalTemplate : state.horizontalTemplate;
+}
+
+function variantTemplateForPlatform(platform, offset = 0) {
   const templates = templatesForPlatform(platform);
-  if (templates.includes(state.template)) return state.template;
   return templates[offset % templates.length];
 }
 
@@ -242,12 +246,46 @@ function syncPlatformGrid() {
 }
 
 function syncTemplateSelect() {
-  const templates = templatesForPlatform();
-  if (!templates.includes(state.template)) {
-    state.template = templates[0];
-  }
-  fillSelect('templateSelect', templates);
-  $('templateSelect').value = state.template.id;
+  $('templatePickerButton').textContent = `横屏 · ${state.horizontalTemplate.name} ｜ 竖屏 · ${state.verticalTemplate.name}`;
+  buildTemplateColumn('horizontalTemplateOptions', horizontalTemplates, state.horizontalTemplate, (template) => {
+    state.horizontalTemplate = template;
+  });
+  buildTemplateColumn('verticalTemplateOptions', verticalTemplates, state.verticalTemplate, (template) => {
+    state.verticalTemplate = template;
+  });
+}
+
+function buildTemplateColumn(id, templates, activeTemplate, assign) {
+  const column = $(id);
+  column.innerHTML = '';
+  templates.forEach((template) => {
+    const option = document.createElement('button');
+    option.type = 'button';
+    option.className = `template-option${template.id === activeTemplate.id ? ' active' : ''}`;
+    option.textContent = template.name;
+    option.addEventListener('click', () => {
+      assign(template);
+      closeTemplatePicker();
+      syncTemplateSelect();
+      render();
+      refreshVariants();
+    });
+    column.appendChild(option);
+  });
+}
+
+function toggleTemplatePicker() {
+  const menu = $('templatePickerMenu');
+  const isOpening = menu.hidden;
+  menu.hidden = !isOpening;
+  $('templatePickerButton').setAttribute('aria-expanded', String(isOpening));
+}
+
+function closeTemplatePicker() {
+  const menu = $('templatePickerMenu');
+  if (menu.hidden) return;
+  menu.hidden = true;
+  $('templatePickerButton').setAttribute('aria-expanded', 'false');
 }
 
 function buildPaletteGrid() {
@@ -287,10 +325,9 @@ function bindEvents() {
     $(id).addEventListener('input', () => render());
     $(id).addEventListener('change', refreshVariants);
   });
-  $('templateSelect').addEventListener('change', (event) => {
-    state.template = templatesForPlatform().find((item) => item.id === event.target.value);
-    render();
-    refreshVariants();
+  $('templatePickerButton').addEventListener('click', toggleTemplatePicker);
+  document.addEventListener('click', (event) => {
+    if (!$('templatePicker').contains(event.target)) closeTemplatePicker();
   });
   $('titleFontSelect').addEventListener('change', (event) => {
     state.titleFont = titleFonts.find((item) => item.id === event.target.value) || titleFonts[0];
@@ -426,7 +463,7 @@ function render(config = {}) {
   const input = { ...getInput(), ...config.input };
   const platform = config.platform || state.platform;
   const palette = config.palette || state.palette;
-  const template = config.template || state.template;
+  const template = config.template || templateForPlatform(platform);
   const pattern = config.pattern || state.pattern;
 
   canvas.width = platform.width;
@@ -473,7 +510,7 @@ function renderMultiPreview(input = getInput(), palette = state.palette, pattern
     const previewCanvas = card.querySelector('canvas');
     previewCanvas.width = platform.width;
     previewCanvas.height = platform.height;
-    drawCover(previewCanvas.getContext('2d'), platform, palette, templateForPlatform(platform, index), pattern, input);
+    drawCover(previewCanvas.getContext('2d'), platform, palette, templateForPlatform(platform), pattern, input);
     wall.appendChild(card);
   });
   wall.querySelectorAll('.platform-preview-card').forEach((card) => {
@@ -1066,9 +1103,10 @@ function drawTracked(target, text, x, y, spacing, align) {
 function randomStyle() {
   state.palette = pick(palettes);
   state.pattern = pick(patterns);
-  state.template = pick(templatesForPlatform());
+  state.horizontalTemplate = pick(horizontalTemplates);
+  state.verticalTemplate = pick(verticalTemplates);
   $('patternSelect').value = state.pattern.id;
-  $('templateSelect').value = state.template.id;
+  syncTemplateSelect();
   $('patternStrength').value = 18 + Math.floor(Math.random() * 44);
   $('fontSizeInput').value = 118 + Math.floor(Math.random() * 62);
   showPaletteGroupForCurrent();
@@ -1133,8 +1171,9 @@ function makeVariants(count, shuffle = false) {
   grid.innerHTML = '';
   const paletteStart = palettes.indexOf(state.palette);
   const patternStart = patterns.indexOf(state.pattern);
-  const currentTemplates = templatesForPlatform();
-  const templateStart = currentTemplates.indexOf(state.template);
+  const currentTemplates = templatesForPlatform(state.platform);
+  const currentTemplate = templateForPlatform(state.platform);
+  const templateStart = Math.max(0, currentTemplates.indexOf(currentTemplate));
   const offset = shuffle ? state.variantSeed : 0;
   state.variants = Array.from({ length: count }, (_, index) => {
     const platform = state.platform;
@@ -1192,7 +1231,7 @@ function makeSuiteVariants(count, shuffle = false) {
       thumb.width = platform.width;
       thumb.height = platform.height;
       if (isVerticalPlatform(platform)) thumb.className = 'vertical-mini';
-      drawCover(thumb.getContext('2d'), platform, variant.palette, templateForPlatform(platform, variant.templateOffset + platformIndex), variant.pattern, variant.input);
+      drawCover(thumb.getContext('2d'), platform, variant.palette, variantTemplateForPlatform(platform, variant.templateOffset + platformIndex), variant.pattern, variant.input);
       stack.appendChild(thumb);
     });
     const label = document.createElement('span');
@@ -1208,11 +1247,14 @@ function applyVariant(index) {
   state.platform = variant.platform;
   state.palette = variant.palette;
   state.pattern = variant.pattern;
-  state.template = variant.template;
+  if (isVerticalPlatform(variant.platform)) {
+    state.verticalTemplate = variant.template;
+  } else {
+    state.horizontalTemplate = variant.template;
+  }
   syncTemplateSelect();
   syncPlatformGrid();
   $('patternSelect').value = state.pattern.id;
-  $('templateSelect').value = state.template.id;
   $('fontSizeInput').value = variant.input.size;
   $('patternStrength').value = Math.round(variant.input.strength * 100);
   showPaletteGroupForCurrent();
@@ -1244,7 +1286,7 @@ function exportAllPng() {
     const output = document.createElement('canvas');
     output.width = platform.width;
     output.height = platform.height;
-    drawCover(output.getContext('2d'), platform, state.palette, templateForPlatform(platform, index), state.pattern, input);
+    drawCover(output.getContext('2d'), platform, state.palette, templateForPlatform(platform), state.pattern, input);
     setTimeout(() => downloadCanvas(output, platform), index * 120);
   });
 }

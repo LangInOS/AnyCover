@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AnyCover - 多平台封面生成器</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="stylesheet" href="styles.css?v=20260505-title-font-size">
+  <link rel="stylesheet" href="styles.css?v=20260505-dual-template-picker">
 </head>
 <body>
   <main class="wrap">
@@ -89,10 +89,24 @@
 
       <aside class="panel style-panel">
         <h2>样式</h2>
-        <label>
-          版式模板
-          <select id="templateSelect"></select>
-        </label>
+        <div class="field template-field">
+          <div class="field-label-row label-text">
+            <span>版式模板</span>
+          </div>
+          <div id="templatePicker" class="template-picker">
+            <button id="templatePickerButton" class="template-picker-button" type="button" aria-expanded="false" aria-controls="templatePickerMenu"></button>
+            <div id="templatePickerMenu" class="template-picker-menu" hidden>
+              <div class="template-column">
+                <strong>横屏</strong>
+                <div id="horizontalTemplateOptions"></div>
+              </div>
+              <div class="template-column">
+                <strong>竖屏</strong>
+                <div id="verticalTemplateOptions"></div>
+              </div>
+            </div>
+          </div>
+        </div>
         <label>
           标题字体
           <select id="titleFontSelect"></select>
@@ -179,6 +193,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260505-title-font-size"></script>
+  <script src="app.js?v=20260505-dual-template-picker"></script>
 </body>
 </html>
