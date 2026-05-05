@@ -99,7 +99,7 @@ const state = {
   variants: [],
   previewPositions: {},
   previewZ: 1,
-  previewGrid: true
+  previewGrid: false
 };
 
 const $ = (id) => document.getElementById(id);
@@ -281,6 +281,7 @@ function bindEvents() {
 
 function syncPreviewGrid() {
   $('multiPreviewWall').classList.toggle('show-grid', state.previewGrid);
+  $('singlePreview').classList.toggle('show-grid', state.previewGrid);
   $('previewGridToggle').checked = state.previewGrid;
 }
 

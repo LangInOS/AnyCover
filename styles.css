@@ -528,6 +528,16 @@ button {
   background-position: 2px 2px;
 }
 
+.canvas-stage.show-grid {
+  background-color: #0b0b0a;
+  background-image:
+    linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px),
+    linear-gradient(rgba(106,178,148,.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(106,178,148,.12) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px;
+}
+
 .platform-preview-card {
   position: absolute;
   left: 0;
