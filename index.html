@@ -20,55 +20,61 @@
     </header>
 
     <section class="layout">
-      <aside class="panel copy-panel">
-        <h2>文案</h2>
-        <label>
-          顶部标签
-          <input id="tagInput" value="ANYCOVER">
-        </label>
-        <label>
-          引导句
-          <input id="leadInput" value="把一个观点做成">
-        </label>
-        <label>
-          核心标题
-          <textarea id="titleInput">能让人停下来的`封面`</textarea>
-          <span class="hint">用反引号包裹高亮词，例如：我的`AI工作流`</span>
-        </label>
-        <div class="inline-actions">
-          <button id="randomHighlightBtn" class="ghost" type="button">随机高亮</button>
-          <button id="clearHighlightBtn" class="ghost" type="button">清除高亮</button>
-        </div>
-        <label>
-          背景水印字
-          <input id="watermarkInput" maxlength="4" placeholder="留空自动取高亮词">
-        </label>
-        <div class="inline-actions watermark-actions">
-          <button id="randomWatermarkBtn" class="ghost" type="button">随机水印</button>
-          <button id="clearWatermarkBtn" class="ghost" type="button">跟随高亮</button>
-        </div>
-        <label>
-          署名
-          <input id="signInput" value="AnyCover · creator · 2026">
-        </label>
-      </aside>
+      <div class="left-stack">
+        <aside class="panel platform-panel">
+          <div class="panel-title-row">
+            <h2>平台</h2>
+            <label class="multi-toggle compact-mode-toggle">
+              <input id="multiPlatformToggle" type="checkbox" checked>
+              <span class="switch-track" aria-hidden="true"><span></span></span>
+              <span class="switch-label">多平台</span>
+            </label>
+          </div>
+          <div class="field platform-field">
+            <div class="field-label-row">
+              <span>发布平台</span>
+              <span id="platformModeHint" class="mode-hint">默认全选，可取消不需要的平台</span>
+            </div>
+            <div id="platformGrid" class="platform-grid"></div>
+          </div>
+        </aside>
+
+        <aside class="panel copy-panel">
+          <h2>文案</h2>
+          <label>
+            顶部标签
+            <input id="tagInput" value="ANYCOVER">
+          </label>
+          <label>
+            引导句
+            <input id="leadInput" value="把一个观点做成">
+          </label>
+          <label>
+            核心标题
+            <textarea id="titleInput">能让人停下来的`封面`</textarea>
+            <span class="hint">用反引号包裹高亮词，例如：我的`AI工作流`</span>
+          </label>
+          <div class="inline-actions">
+            <button id="randomHighlightBtn" class="ghost" type="button">随机高亮</button>
+            <button id="clearHighlightBtn" class="ghost" type="button">清除高亮</button>
+          </div>
+          <label>
+            背景水印字
+            <input id="watermarkInput" maxlength="4" placeholder="留空自动取高亮词">
+          </label>
+          <div class="inline-actions watermark-actions">
+            <button id="randomWatermarkBtn" class="ghost" type="button">随机水印</button>
+            <button id="clearWatermarkBtn" class="ghost" type="button">跟随高亮</button>
+          </div>
+          <label>
+            署名
+            <input id="signInput" value="AnyCover · creator · 2026">
+          </label>
+        </aside>
+      </div>
 
       <aside class="panel style-panel">
-        <div class="panel-title-row">
-          <h2>样式</h2>
-          <label class="multi-toggle compact-mode-toggle">
-            <input id="multiPlatformToggle" type="checkbox" checked>
-            <span class="switch-track" aria-hidden="true"><span></span></span>
-            <span class="switch-label">多平台</span>
-          </label>
-        </div>
-        <div class="field">
-          <div class="field-label-row">
-            <span>发布平台</span>
-            <span id="platformModeHint" class="mode-hint">默认全选，可取消不需要的平台</span>
-          </div>
-          <div id="platformGrid" class="platform-grid"></div>
-        </div>
+        <h2>样式</h2>
         <label>
           版式模板
           <select id="templateSelect"></select>
@@ -154,6 +160,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260505-minimal-platform-toggle"></script>
+  <script src="app.js?v=20260505-platform-card-layout"></script>
 </body>
 </html>

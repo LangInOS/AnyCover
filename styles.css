@@ -190,6 +190,13 @@ p {
   align-items: stretch;
 }
 
+.left-stack {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .panel {
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -221,6 +228,10 @@ label, .label-text, .field {
   font-size: 12px;
   font-weight: 650;
   letter-spacing: .04em;
+}
+
+.platform-field {
+  margin-bottom: 0;
 }
 
 .field-label-row {
@@ -735,6 +746,7 @@ button {
   .topbar { display: block; }
   .brand img { width: 52px; height: 52px; }
   .layout { grid-template-columns: 1fr; }
+  .left-stack { gap: 12px; }
   .preview-panel { grid-column: auto; }
   .platform-grid { grid-template-columns: 1fr; }
   .variant-grid { grid-template-columns: repeat(2, 1fr); }
