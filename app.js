@@ -85,7 +85,7 @@ const palettes = [
   { id: 'earth-green', name: '土绿暖白', bg: '#211f17', bg2: '#312d20', text: '#f0e6cf', muted: '#958c78', accent: '#739b5f', mark: '#ffffff' }
 ];
 
-const palettesPerPage = 12;
+const palettesPerPage = 9;
 const defaultPattern = patterns.find((pattern) => pattern.id === 'corners') || patterns[0];
 
 const state = {
