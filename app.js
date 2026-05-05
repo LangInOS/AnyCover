@@ -383,6 +383,22 @@ function setMultiPlatform(enabled) {
   refreshVariants();
 }
 
+function enterSinglePlatform(platform) {
+  state.mode = 'single';
+  state.platform = platform;
+  state.selectedPlatformIds = [platform.id];
+  syncModeUI();
+  syncPlatformGrid();
+  syncTemplateSelect();
+  render();
+  setBatchMeta(`${platform.name} · 单平台精修`);
+  refreshVariants();
+}
+
+function platformById(id) {
+  return platforms.find((platform) => platform.id === id) || state.platform;
+}
+
 function syncModeUI() {
   const enabled = state.mode === 'batch';
   $('multiPlatformToggle').checked = enabled;
@@ -494,10 +510,23 @@ function renderMultiPreview(input = getInput(), palette = state.palette, pattern
           card.dataset.dragged = 'false';
           return;
         }
-        state.platform = platforms.find((item) => item.id === card.dataset.platformId) || state.platform;
-        syncTemplateSelect();
-        syncPlatformGrid();
-        render();
+        clearTimeout(card.previewClickTimer);
+        card.previewClickTimer = setTimeout(() => {
+          state.platform = platformById(card.dataset.platformId);
+          syncTemplateSelect();
+          syncPlatformGrid();
+          render();
+        }, 180);
+      });
+      card.addEventListener('dblclick', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        clearTimeout(card.previewClickTimer);
+        if (card.dataset.dragged === 'true') {
+          card.dataset.dragged = 'false';
+          return;
+        }
+        enterSinglePlatform(platformById(card.dataset.platformId));
       });
       enablePreviewDrag(card, wall);
       enablePreviewResize(card, wall);
