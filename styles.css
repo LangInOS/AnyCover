@@ -105,6 +105,7 @@ p {
   margin: 0;
   padding: 0;
   border: 0;
+  line-height: 12px;
 }
 
 .compact-mode-toggle {
@@ -113,6 +114,7 @@ p {
   gap: 4px;
   min-height: 12px;
   max-width: 72px;
+  margin: 0;
   padding: 0;
   border: 0;
   border-radius: 0;
