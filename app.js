@@ -623,7 +623,7 @@ function enablePreviewResize(card, wall) {
         if (Math.abs(width - startWidth) > 3 || Math.abs(nextX - start.x) > 3 || Math.abs(nextY - start.y) > 3) {
           moved = true;
         }
-        setPreviewCardSize(card, ratio, width);
+        setPreviewCardSize(card, ratio, width, true);
         setPreviewCardPosition(card, nextX, nextY, true, z);
         updatePreviewWallHeight(wall);
       };
@@ -690,7 +690,7 @@ function setPreviewCardPosition(card, x, y, save = false, z) {
       x: nextX,
       y: nextY,
       z: z || Number(card.style.zIndex || 1),
-      width: current.width || card.offsetWidth
+      width: card.offsetWidth
     };
   }
 }
