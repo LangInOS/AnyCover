@@ -92,9 +92,9 @@ p {
 }
 
 .panel-title-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
   margin-bottom: 10px;
   padding-bottom: 9px;
@@ -108,17 +108,29 @@ p {
 }
 
 .compact-mode-toggle {
-  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
+  justify-self: end;
   gap: 6px;
   min-height: 26px;
+  max-width: 118px;
   padding: 4px 7px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #121211;
   font-size: 10px;
   letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.compact-mode-toggle .switch-label {
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  line-height: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .multi-toggle {
@@ -387,12 +399,11 @@ button {
 
 .platform-chip-main,
 .preview-platform-title {
-  display: inline-grid;
-  grid-template-columns: 14px minmax(0, auto);
+  display: flex;
   align-items: center;
   min-width: 0;
-  column-gap: 5px;
-  line-height: 16px;
+  gap: 5px;
+  line-height: 1;
 }
 
 .platform-icon {
@@ -405,7 +416,7 @@ button {
   max-height: 14px;
   display: block;
   align-self: center;
-  justify-self: center;
+  transform: translateY(.5px);
   color: var(--accent) !important;
   fill: none !important;
   stroke: var(--accent) !important;
@@ -428,7 +439,7 @@ button {
   min-width: 0;
   color: var(--text);
   font-size: 12px;
-  line-height: 1.1;
+  line-height: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -577,6 +588,7 @@ button {
   min-width: 0;
   color: var(--text);
   font-size: 12px;
+  line-height: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
