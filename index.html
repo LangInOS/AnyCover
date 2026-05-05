@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AnyCover - 多平台封面生成器</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="stylesheet" href="styles.css?v=20260505-platform-chip-type">
+  <link rel="stylesheet" href="styles.css?v=20260505-export-links-handles">
 </head>
 <body>
   <main class="wrap">
@@ -17,6 +17,18 @@
           <p>输入观点 -> 选择平台与样式 -> 生成任意场景封面 PNG</p>
         </div>
       </div>
+      <nav class="account-links" aria-label="作者链接">
+        <a href="https://x.com/LangInOS" target="_blank" rel="noreferrer" aria-label="X @LangInOS">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 5l14 14M19 5 5 19"></path>
+          </svg>
+        </a>
+        <a href="https://github.com/LangInOS/AnyCover" target="_blank" rel="noreferrer" aria-label="GitHub 仓库">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2.8a9.2 9.2 0 0 0-2.9 17.9c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.1-3.4-1.1-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.6 2.4 1.1 2.9.8.1-.7.4-1.1.7-1.4-2.2-.2-4.6-1.1-4.6-4.8 0-1.1.4-1.9 1-2.6-.1-.3-.4-1.3.1-2.6 0 0 .8-.3 2.7 1a9.3 9.3 0 0 1 4.8 0c1.8-1.2 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.6.6.7 1 1.5 1 2.6 0 3.7-2.3 4.6-4.6 4.8.4.3.7.9.7 1.8v2.7c0 .3.2.6.7.5A9.2 9.2 0 0 0 12 2.8Z"></path>
+          </svg>
+        </a>
+      </nav>
     </header>
 
     <section class="layout">
@@ -129,7 +141,8 @@
           </div>
           <div id="paletteGrid" class="palette-grid"></div>
         </div>
-        <button id="exportBtn" class="primary" type="button">导出 PNG</button>
+        <button id="exportBtn" class="primary" type="button">导出选中 PNG</button>
+        <button id="exportAllBtn" class="primary secondary-primary" type="button">导出所有 PNG</button>
         <div class="inline-actions">
           <button id="randomStyleBtn" class="ghost" type="button">随机样式</button>
           <button id="generateBatchBtn" class="ghost" type="button">换一组候选</button>
@@ -160,6 +173,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260505-resize-persist-fix"></script>
+  <script src="app.js?v=20260505-export-links-handles"></script>
 </body>
 </html>

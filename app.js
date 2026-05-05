@@ -287,6 +287,7 @@ function bindEvents() {
     syncPreviewGrid();
   });
   $('exportBtn').addEventListener('click', exportPng);
+  $('exportAllBtn').addEventListener('click', exportAllPng);
   $('randomStyleBtn').addEventListener('click', randomStyle);
   $('generateBatchBtn').addEventListener('click', generateVariants);
   $('randomPatternBtn').addEventListener('click', randomPattern);
@@ -330,7 +331,8 @@ function syncModeUI() {
   $('previewTitle').textContent = enabled ? '多平台预览' : '单平台精修';
   $('batchTitle').textContent = enabled ? '套装候选' : '候选封面';
   $('platformModeHint').textContent = enabled ? '默认全选，可取消不需要的平台' : '选择一个平台精修';
-  $('exportBtn').textContent = enabled ? '导出焦点 PNG' : '导出 PNG';
+  $('exportBtn').textContent = '导出选中 PNG';
+  $('exportAllBtn').textContent = enabled ? '导出所有 PNG' : '导出当前 PNG';
   document.querySelector('.preview-panel').classList.toggle('is-batch', enabled);
   document.querySelector('.preview-panel').classList.toggle('is-single', !enabled);
 }
@@ -1203,10 +1205,26 @@ function applySuiteVariant(index) {
 
 function exportPng() {
   render();
+  downloadCanvas(canvas, state.platform);
+}
+
+function exportAllPng() {
+  const input = getInput();
+  const platformsToExport = state.mode === 'batch' ? selectedPlatforms() : [state.platform];
+  platformsToExport.forEach((platform, index) => {
+    const output = document.createElement('canvas');
+    output.width = platform.width;
+    output.height = platform.height;
+    drawCover(output.getContext('2d'), platform, state.palette, templateForPlatform(platform, index), state.pattern, input);
+    setTimeout(() => downloadCanvas(output, platform), index * 120);
+  });
+}
+
+function downloadCanvas(sourceCanvas, platform) {
   const link = document.createElement('a');
   const cleanTitle = $('titleInput').value.replace(/`/g, '').replace(/[\\/:*?"<>|]/g, '_').slice(0, 24);
-  link.download = `AnyCover_${state.platform.id}_${cleanTitle || 'cover'}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.download = `AnyCover_${platform.id}_${cleanTitle || 'cover'}.png`;
+  link.href = sourceCanvas.toDataURL('image/png');
   link.click();
 }
 
