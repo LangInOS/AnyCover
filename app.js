@@ -89,12 +89,26 @@ const palettesPerPage = 9;
 const defaultPattern = patterns.find((pattern) => pattern.id === 'corners') || patterns[0];
 const previewLayoutStorageKey = 'anycover.previewLayout.v1';
 
+const titleFonts = [
+  { id: 'serif-sc', name: '思源宋体·重体', family: '"Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, SimSun, serif', normal: 850, highlight: 900 },
+  { id: 'songti', name: '宋体·粗', family: '"Songti SC", STSong, SimSun, serif', normal: 850, highlight: 900 },
+  { id: 'fangsong', name: '仿宋', family: 'STFangsong, FangSong, serif', normal: 700, highlight: 900 },
+  { id: 'kaiti', name: '楷体', family: '"Kaiti SC", STKaiti, KaiTi, serif', normal: 700, highlight: 900 },
+  { id: 'yuanti', name: '圆体·粗', family: '"PingFang SC", "Yuanti SC", "Hiragino Sans GB", sans-serif', normal: 780, highlight: 900 },
+  { id: 'pingfang', name: '苹方·极粗', family: '"PingFang SC", "Helvetica Neue", sans-serif', normal: 850, highlight: 900 },
+  { id: 'heiti', name: '黑体·粗', family: '"Heiti SC", STHeiti, SimHei, sans-serif', normal: 850, highlight: 900 },
+  { id: 'lishu', name: '隶书', family: 'STLiti, LiSu, serif', normal: 700, highlight: 900 },
+  { id: 'xingkai', name: '行楷·手写', family: 'STXingkai, "HanziPen SC", cursive', normal: 700, highlight: 900 },
+  { id: 'serif-italic', name: '衬线斜体', family: '"Noto Serif SC", "Songti SC", serif', normal: 820, highlight: 900, italic: true }
+];
+
 const state = {
   mode: 'batch',
   platform: platforms[0],
   selectedPlatformIds: platforms.map((platform) => platform.id),
   template: horizontalTemplates[0],
   pattern: defaultPattern,
+  titleFont: titleFonts[0],
   palette: palettes[0],
   palettePage: 0,
   variantSeed: 0,
@@ -129,6 +143,8 @@ const $ = (id) => document.getElementById(id);
 function init() {
   buildPlatformGrid();
   syncTemplateSelect();
+  fillSelect('titleFontSelect', titleFonts);
+  $('titleFontSelect').value = state.titleFont.id;
   fillSelect('patternSelect', patterns);
   $('patternSelect').value = state.pattern.id;
   buildPaletteGrid();
@@ -276,6 +292,11 @@ function bindEvents() {
     render();
     refreshVariants();
   });
+  $('titleFontSelect').addEventListener('change', (event) => {
+    state.titleFont = titleFonts.find((item) => item.id === event.target.value) || titleFonts[0];
+    render();
+    refreshVariants();
+  });
   $('patternSelect').addEventListener('change', (event) => {
     state.pattern = patterns.find((item) => item.id === event.target.value);
     render();
@@ -374,6 +395,7 @@ function getInput() {
     watermark: $('watermarkInput').value.trim(),
     sign: $('signInput').value.trim(),
     size: Number($('fontSizeInput').value),
+    titleFont: state.titleFont.id,
     strength: Number($('patternStrength').value) / 100
   };
 }
@@ -969,7 +991,7 @@ function drawRichLines(target, lines, x, y, size, palette, align) {
     lineParts.forEach((part) => {
       target.save();
       target.fillStyle = part.highlight ? palette.accent : palette.text;
-      target.font = `${part.highlight ? '900' : '850'} ${Math.round(size)}px Georgia, "Noto Serif SC", "Songti SC", serif`;
+      target.font = titleFontRule(part.highlight, size);
       target.textBaseline = 'middle';
       target.textAlign = 'left';
       target.fillText(part.text, cursor, startY + index * lineHeight);
@@ -1019,9 +1041,16 @@ function mergeAdjacent(parts) {
 
 function measureParts(target, parts, size) {
   return parts.reduce((sum, part) => {
-    target.font = `${part.highlight ? '900' : '850'} ${Math.round(size)}px Georgia, "Noto Serif SC", "Songti SC", serif`;
+    target.font = titleFontRule(part.highlight, size);
     return sum + target.measureText(part.text).width;
   }, 0);
+}
+
+function titleFontRule(highlight, size) {
+  const font = state.titleFont || titleFonts[0];
+  const weight = highlight ? font.highlight : font.normal;
+  const italic = font.italic ? 'italic ' : '';
+  return `${italic}${weight} ${Math.round(size)}px ${font.family}`;
 }
 
 function drawTracked(target, text, x, y, spacing, align) {

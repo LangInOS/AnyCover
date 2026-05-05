@@ -69,25 +69,45 @@ p {
 .account-links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   flex: 0 0 auto;
 }
 
 .account-links a {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: 9px;
-  background: #141413;
-  color: var(--muted);
+  background: #171816;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+
+.account-links a:first-child {
+  border-color: rgba(106,178,148,.7);
+  background: var(--accent);
+  color: #07110e;
+}
+
+.account-links a:last-child {
+  border-color: rgba(228,196,109,.48);
+  color: #ead7a0;
 }
 
 .account-links a:hover {
-  border-color: rgba(106,178,148,.72);
-  color: var(--accent);
-  background: rgba(106,178,148,.08);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(0,0,0,.28);
+}
+
+.account-links a:last-child:hover {
+  border-color: rgba(228,196,109,.75);
+  background: rgba(228,196,109,.1);
 }
 
 .account-links svg {
@@ -877,6 +897,7 @@ button {
 @media (max-width: 700px) {
   .wrap { width: min(100vw - 24px, 620px); padding-top: 16px; }
   .topbar { display: block; }
+  .account-links { margin-top: 10px; }
   .brand img { width: 52px; height: 52px; }
   .layout { grid-template-columns: 1fr; }
   .left-stack { gap: 12px; }
