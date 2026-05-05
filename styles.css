@@ -91,6 +91,12 @@ p {
   background: #141413;
 }
 
+.platform-mode-toggle {
+  justify-content: space-between;
+  width: 100%;
+  margin: 8px 0 7px;
+}
+
 .multi-toggle {
   position: relative;
   color: var(--muted);
@@ -623,7 +629,6 @@ button {
   .wrap { width: min(100vw - 24px, 620px); padding-top: 16px; }
   .topbar { display: block; }
   .brand img { width: 52px; height: 52px; }
-  .top-actions { margin-top: 16px; width: 100%; }
   .layout { grid-template-columns: 1fr; }
   .preview-panel { grid-column: auto; }
   .platform-grid { grid-template-columns: 1fr; }
