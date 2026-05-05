@@ -87,7 +87,7 @@ const palettes = [
 
 const palettesPerPage = 9;
 const defaultPattern = patterns.find((pattern) => pattern.id === 'corners') || patterns[0];
-const previewLayoutStorageKey = 'anycover.previewLayout.v1';
+const previewLayoutStorageKey = 'anycover.previewLayout.v2';
 
 const titleFonts = [
   { id: 'serif-sc', name: '思源宋体·重体', family: '"Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, SimSun, serif', normal: 850, highlight: 900 },
@@ -541,6 +541,8 @@ function layoutMultiPreview() {
   const headerHeight = 34;
   const hasManualLayout = cards.some((card) => state.previewPositions[card.dataset.platformId]);
 
+  if (!hasManualLayout && applyDefaultPreviewLayout(wall, cards)) return;
+
   const placements = cards.map((card) => {
     const canvas = card.querySelector('canvas');
     const ratio = canvas.width / canvas.height;
@@ -603,6 +605,60 @@ function layoutMultiPreview() {
     }
   });
   updatePreviewWallHeight(wall);
+}
+
+function applyDefaultPreviewLayout(wall, cards) {
+  const width = wall.clientWidth;
+  if (width < 760) return false;
+
+  const byId = new Map(cards.map((card) => [card.dataset.platformId, card]));
+  const gap = 10;
+  const rightWidth = Math.min(310, Math.max(230, width * .16));
+  const rightX = Math.max(0, width - rightWidth - 2);
+  const leftAreaWidth = Math.max(1, rightX - gap);
+  const leftWidth = Math.min(520, Math.max(360, leftAreaWidth * .48));
+  const middleWidth = Math.max(260, leftAreaWidth - leftWidth - gap);
+  const smallWidth = Math.max(140, (middleWidth - gap) / 2);
+
+  const baseSlots = {
+    x: { x: 0, y: 0, width: leftWidth },
+    youtube: { x: 0, y: 0, width: leftWidth },
+    wechat: { x: leftWidth + gap, y: 0, width: middleWidth },
+    channels: { x: leftWidth + gap, y: 0, width: smallWidth },
+    xiaohongshu: { x: leftWidth + gap + smallWidth + gap, y: 0, width: smallWidth },
+    douyin: { x: rightX, y: 0, width: rightWidth }
+  };
+
+  const xHeight = byId.has('x') ? previewCardHeight(baseSlots.x.width, previewCardRatio(byId.get('x'))) : 0;
+  const wechatHeight = byId.has('wechat') ? previewCardHeight(baseSlots.wechat.width, previewCardRatio(byId.get('wechat'))) : xHeight;
+  const secondRowY = Math.max(xHeight, wechatHeight) + gap;
+  baseSlots.youtube.y = secondRowY;
+  baseSlots.channels.y = secondRowY;
+  baseSlots.xiaohongshu.y = secondRowY;
+
+  const fallbackCards = cards.filter((card) => !baseSlots[card.dataset.platformId]);
+  let fallbackY = secondRowY;
+  fallbackCards.forEach((card) => {
+    baseSlots[card.dataset.platformId] = { x: 0, y: fallbackY, width: leftWidth };
+    fallbackY += previewCardHeight(leftWidth, previewCardRatio(card)) + gap;
+  });
+
+  const naturalHeight = cards.reduce((max, card) => {
+    const slot = baseSlots[card.dataset.platformId];
+    if (!slot) return max;
+    return Math.max(max, slot.y + previewCardHeight(slot.width, previewCardRatio(card)));
+  }, 0);
+  const scale = Math.min(1, previewAutoHeight(wall) / Math.max(1, naturalHeight));
+
+  cards.forEach((card) => {
+    const slot = baseSlots[card.dataset.platformId];
+    if (!slot) return;
+    const ratio = previewCardRatio(card);
+    setPreviewCardSize(card, ratio, slot.width * scale);
+    setPreviewCardPosition(card, slot.x * scale, slot.y * scale, false);
+  });
+  updatePreviewWallHeight(wall);
+  return true;
 }
 
 function previewAutoHeight(wall) {
