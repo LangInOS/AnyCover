@@ -240,11 +240,15 @@ function getVisiblePalettes() {
 }
 
 function bindEvents() {
-  ['tagInput', 'leadInput', 'titleInput', 'watermarkInput', 'signInput', 'patternStrength', 'fontSizeInput'].forEach((id) => {
+  ['tagInput', 'leadInput', 'titleInput', 'watermarkInput', 'signInput'].forEach((id) => {
     $(id).addEventListener('input', () => {
       render();
       refreshVariants();
     });
+  });
+  ['patternStrength', 'fontSizeInput'].forEach((id) => {
+    $(id).addEventListener('input', () => render());
+    $(id).addEventListener('change', refreshVariants);
   });
   $('templateSelect').addEventListener('change', (event) => {
     state.template = templatesForPlatform().find((item) => item.id === event.target.value);
@@ -394,30 +398,40 @@ function render(config = {}) {
 
 function renderMultiPreview(input = getInput(), palette = state.palette, pattern = state.pattern) {
   const wall = $('multiPreviewWall');
-  wall.innerHTML = '';
+  const activeIds = new Set();
   selectedPlatforms().forEach((platform, index) => {
-    const card = document.createElement('button');
-    card.type = 'button';
+    activeIds.add(platform.id);
+    let card = wall.querySelector(`.platform-preview-card[data-platform-id="${platform.id}"]`);
+    if (!card) {
+      card = document.createElement('button');
+      card.type = 'button';
+      card.dataset.platformId = platform.id;
+      card.innerHTML = `<header><span class="preview-platform-title">${platformIcon(platform.id)}<strong></strong></span><span></span></header><canvas></canvas>`;
+      card.addEventListener('click', () => {
+        if (card.dataset.dragged === 'true') {
+          card.dataset.dragged = 'false';
+          return;
+        }
+        state.platform = platforms.find((item) => item.id === card.dataset.platformId) || state.platform;
+        syncTemplateSelect();
+        syncPlatformGrid();
+        render();
+      });
+      enablePreviewDrag(card, wall);
+    }
     card.className = `platform-preview-card ${previewShapeClass(platform)}${platform.id === state.platform.id ? ' focused' : ''}`;
-    card.dataset.platformId = platform.id;
-    card.innerHTML = `<header><span class="preview-platform-title">${platformIcon(platform.id)}<strong>${platform.name}</strong></span><span>${platform.width}x${platform.height}</span></header>`;
-    const previewCanvas = document.createElement('canvas');
+    const title = card.querySelector('.preview-platform-title strong');
+    const size = card.querySelector('header > span:last-child');
+    title.textContent = platform.name;
+    size.textContent = `${platform.width}x${platform.height}`;
+    const previewCanvas = card.querySelector('canvas');
     previewCanvas.width = platform.width;
     previewCanvas.height = platform.height;
     drawCover(previewCanvas.getContext('2d'), platform, palette, templateForPlatform(platform, index), pattern, input);
-    card.appendChild(previewCanvas);
-    card.addEventListener('click', () => {
-      if (card.dataset.dragged === 'true') {
-        card.dataset.dragged = 'false';
-        return;
-      }
-      state.platform = platform;
-      syncTemplateSelect();
-      syncPlatformGrid();
-      render();
-    });
-    enablePreviewDrag(card, wall);
     wall.appendChild(card);
+  });
+  wall.querySelectorAll('.platform-preview-card').forEach((card) => {
+    if (!activeIds.has(card.dataset.platformId)) card.remove();
   });
   requestAnimationFrame(layoutMultiPreview);
 }
