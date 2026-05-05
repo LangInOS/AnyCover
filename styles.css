@@ -579,7 +579,8 @@ button {
 }
 
 .platform-preview-card.focused { border-color: var(--accent); }
-.platform-preview-card.dragging {
+.platform-preview-card.dragging,
+.platform-preview-card.resizing {
   cursor: grabbing;
   transition: border-color .16s ease;
 }
@@ -627,6 +628,59 @@ button {
   width: 100%;
   height: calc(100% - 34px);
   background: #080808;
+}
+
+.preview-resize-handle {
+  position: absolute;
+  z-index: 4;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(106,178,148,.76);
+  background: rgba(12,14,13,.86);
+  opacity: 0;
+  transition: opacity .16s ease, background .16s ease;
+}
+
+.platform-preview-card:hover .preview-resize-handle,
+.platform-preview-card.focused .preview-resize-handle,
+.platform-preview-card.resizing .preview-resize-handle {
+  opacity: 1;
+}
+
+.preview-resize-handle:hover {
+  background: var(--accent);
+}
+
+.preview-resize-handle.top-left {
+  top: 5px;
+  left: 5px;
+  border-right: 0;
+  border-bottom: 0;
+  cursor: nwse-resize;
+}
+
+.preview-resize-handle.top-right {
+  top: 5px;
+  right: 5px;
+  border-left: 0;
+  border-bottom: 0;
+  cursor: nesw-resize;
+}
+
+.preview-resize-handle.bottom-left {
+  bottom: 5px;
+  left: 5px;
+  border-right: 0;
+  border-top: 0;
+  cursor: nesw-resize;
+}
+
+.preview-resize-handle.bottom-right {
+  right: 5px;
+  bottom: 5px;
+  border-left: 0;
+  border-top: 0;
+  cursor: nwse-resize;
 }
 
 .preview-panel.is-single .multi-preview-wall,

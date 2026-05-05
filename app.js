@@ -87,6 +87,7 @@ const palettes = [
 
 const palettesPerPage = 9;
 const defaultPattern = patterns.find((pattern) => pattern.id === 'corners') || patterns[0];
+const previewLayoutStorageKey = 'anycover.previewLayout.v1';
 
 const state = {
   mode: 'batch',
@@ -98,10 +99,30 @@ const state = {
   palettePage: 0,
   variantSeed: 0,
   variants: [],
-  previewPositions: {},
+  previewPositions: loadPreviewLayout(),
   previewZ: 1,
   previewGrid: false
 };
+
+function loadPreviewLayout() {
+  try {
+    const value = localStorage.getItem(previewLayoutStorageKey);
+    if (!value) return {};
+    const parsed = JSON.parse(value);
+    if (!parsed || typeof parsed !== 'object') return {};
+    return parsed;
+  } catch (error) {
+    return {};
+  }
+}
+
+function savePreviewLayout() {
+  try {
+    localStorage.setItem(previewLayoutStorageKey, JSON.stringify(state.previewPositions));
+  } catch (error) {
+    // Layout persistence is a convenience; ignore storage failures.
+  }
+}
 
 const $ = (id) => document.getElementById(id);
 
@@ -406,7 +427,7 @@ function renderMultiPreview(input = getInput(), palette = state.palette, pattern
       card = document.createElement('button');
       card.type = 'button';
       card.dataset.platformId = platform.id;
-      card.innerHTML = `<header><span class="preview-platform-title">${platformIcon(platform.id)}<strong></strong></span><span></span></header><canvas></canvas>`;
+      card.innerHTML = `<header><span class="preview-platform-title">${platformIcon(platform.id)}<strong></strong></span><span></span></header><canvas></canvas><span class="preview-resize-handle top-left" data-corner="top-left"></span><span class="preview-resize-handle top-right" data-corner="top-right"></span><span class="preview-resize-handle bottom-left" data-corner="bottom-left"></span><span class="preview-resize-handle bottom-right" data-corner="bottom-right"></span>`;
       card.addEventListener('click', () => {
         if (card.dataset.dragged === 'true') {
           card.dataset.dragged = 'false';
@@ -418,6 +439,7 @@ function renderMultiPreview(input = getInput(), palette = state.palette, pattern
         render();
       });
       enablePreviewDrag(card, wall);
+      enablePreviewResize(card, wall);
     }
     card.className = `platform-preview-card ${previewShapeClass(platform)}${platform.id === state.platform.id ? ' focused' : ''}`;
     const title = card.querySelector('.preview-platform-title strong');
@@ -505,15 +527,19 @@ function layoutMultiPreview() {
   const maxAutoHeight = previewAutoHeight(wall);
   const scale = Math.min(1, maxAutoHeight / Math.max(1, naturalHeight));
 
-  placements.forEach(({ card, cardWidth, cardHeight, x, y }) => {
-    card.style.width = `${Math.floor(cardWidth * scale)}px`;
-    card.style.height = `${Math.floor(cardHeight * scale)}px`;
+  placements.forEach(({ card, ratio, cardWidth, x, y }) => {
+    setPreviewCardSize(card, ratio, cardWidth * scale);
     setPreviewCardPosition(card, Math.floor(x * scale), Math.floor(y * scale), false);
   });
 
   if (hasManualLayout) cards.forEach((card) => {
     const saved = state.previewPositions[card.dataset.platformId];
-    if (saved) setPreviewCardPosition(card, saved.x, saved.y, false, saved.z);
+    if (!saved) return;
+    const ratio = previewCardRatio(card);
+    if (Number.isFinite(saved.width)) setPreviewCardSize(card, ratio, saved.width);
+    if (Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
+      setPreviewCardPosition(card, saved.x, saved.y, false, saved.z);
+    }
   });
   updatePreviewWallHeight(wall);
 }
@@ -549,6 +575,7 @@ function enablePreviewDrag(card, wall) {
       if (moved) {
         card.dataset.dragged = 'true';
         wall.classList.add('manual-layout');
+        savePreviewLayout();
       }
       card.removeEventListener('pointermove', move);
       card.removeEventListener('pointerup', end);
@@ -561,6 +588,94 @@ function enablePreviewDrag(card, wall) {
   });
 }
 
+function enablePreviewResize(card, wall) {
+  card.querySelectorAll('.preview-resize-handle').forEach((handle) => {
+    handle.addEventListener('pointerdown', (event) => {
+      if (state.mode !== 'batch') return;
+      event.preventDefault();
+      event.stopPropagation();
+      handle.setPointerCapture(event.pointerId);
+
+      const corner = handle.dataset.corner;
+      const start = getPreviewCardPosition(card);
+      const startWidth = card.offsetWidth;
+      const ratio = previewCardRatio(card);
+      const startHeight = previewCardHeight(startWidth, ratio);
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const z = state.previewZ += 1;
+      let moved = false;
+      card.classList.add('resizing');
+      card.style.zIndex = z;
+
+      const move = (moveEvent) => {
+        const dx = moveEvent.clientX - startX;
+        const dy = moveEvent.clientY - startY;
+        const horizontalWidth = corner.includes('left') ? startWidth - dx : startWidth + dx;
+        const verticalHeight = corner.includes('top') ? startHeight - dy : startHeight + dy;
+        const verticalWidth = previewContentWidth(verticalHeight, ratio);
+        const proposedWidth = Math.max(horizontalWidth, verticalWidth);
+        const width = clampPreviewCardWidth(wall, proposedWidth);
+        const height = previewCardHeight(width, ratio);
+        const nextX = corner.includes('left') ? start.x + startWidth - width : start.x;
+        const nextY = corner.includes('top') ? start.y + startHeight - height : start.y;
+
+        if (Math.abs(width - startWidth) > 3 || Math.abs(nextX - start.x) > 3 || Math.abs(nextY - start.y) > 3) {
+          moved = true;
+        }
+        setPreviewCardSize(card, ratio, width);
+        setPreviewCardPosition(card, nextX, nextY, true, z);
+        updatePreviewWallHeight(wall);
+      };
+
+      const end = () => {
+        card.classList.remove('resizing');
+        if (moved) {
+          card.dataset.dragged = 'true';
+          wall.classList.add('manual-layout');
+          savePreviewLayout();
+        }
+        handle.removeEventListener('pointermove', move);
+        handle.removeEventListener('pointerup', end);
+        handle.removeEventListener('pointercancel', end);
+      };
+
+      handle.addEventListener('pointermove', move);
+      handle.addEventListener('pointerup', end);
+      handle.addEventListener('pointercancel', end);
+    });
+  });
+}
+
+function previewCardRatio(card) {
+  const canvas = card.querySelector('canvas');
+  return canvas.width / canvas.height;
+}
+
+function previewCardHeight(width, ratio) {
+  return Math.round(width / ratio) + 34;
+}
+
+function previewContentWidth(height, ratio) {
+  return Math.max(1, (height - 34) * ratio);
+}
+
+function clampPreviewCardWidth(wall, width) {
+  const maxWidth = Math.max(180, wall.clientWidth - 2);
+  return Math.max(140, Math.min(Math.round(width), maxWidth));
+}
+
+function setPreviewCardSize(card, ratio, width, save = false) {
+  const wall = $('multiPreviewWall');
+  const nextWidth = clampPreviewCardWidth(wall, width);
+  card.style.width = `${nextWidth}px`;
+  card.style.height = `${previewCardHeight(nextWidth, ratio)}px`;
+  if (save) {
+    const current = state.previewPositions[card.dataset.platformId] || {};
+    state.previewPositions[card.dataset.platformId] = { ...current, width: nextWidth };
+  }
+}
+
 function setPreviewCardPosition(card, x, y, save = false, z) {
   const wall = $('multiPreviewWall');
   const maxX = Math.max(0, wall.clientWidth - card.offsetWidth - 2);
@@ -569,10 +684,13 @@ function setPreviewCardPosition(card, x, y, save = false, z) {
   card.style.transform = `translate(${nextX}px, ${nextY}px)`;
   if (z) card.style.zIndex = z;
   if (save) {
+    const current = state.previewPositions[card.dataset.platformId] || {};
     state.previewPositions[card.dataset.platformId] = {
+      ...current,
       x: nextX,
       y: nextY,
-      z: z || Number(card.style.zIndex || 1)
+      z: z || Number(card.style.zIndex || 1),
+      width: current.width || card.offsetWidth
     };
   }
 }
