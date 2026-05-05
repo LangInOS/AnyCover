@@ -95,7 +95,7 @@ p {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 10px;
   padding-bottom: 9px;
   border-bottom: 1px solid var(--line);
@@ -111,24 +111,25 @@ p {
   display: inline-flex;
   align-items: center;
   justify-self: end;
-  gap: 6px;
-  min-height: 26px;
-  max-width: 118px;
-  padding: 4px 7px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #121211;
-  font-size: 10px;
+  gap: 4px;
+  min-height: 12px;
+  max-width: 72px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 9px;
   letter-spacing: 0;
   white-space: nowrap;
   overflow: hidden;
+  opacity: .82;
 }
 
 .compact-mode-toggle .switch-label {
   display: block;
   flex: 0 1 auto;
   min-width: 0;
-  line-height: 16px;
+  line-height: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -153,8 +154,8 @@ p {
 
 .switch-track {
   position: relative;
-  width: 30px;
-  height: 16px;
+  width: 20px;
+  height: 10px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: #0f0f0e;
@@ -162,10 +163,10 @@ p {
 
 .switch-track span {
   position: absolute;
-  left: 3px;
+  left: 2px;
   top: 50%;
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--muted);
   transform: translateY(-50%);
@@ -178,7 +179,7 @@ p {
 }
 
 .multi-toggle input:checked + .switch-track span {
-  transform: translate(14px, -50%);
+  transform: translate(10px, -50%);
   background: #08130f;
 }
 
