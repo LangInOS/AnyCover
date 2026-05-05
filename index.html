@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AnyCover - 多平台封面生成器</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="stylesheet" href="styles.css?v=20260505-title-font-links">
+  <link rel="stylesheet" href="styles.css?v=20260505-title-font-size">
 </head>
 <body>
   <main class="wrap">
@@ -97,6 +97,10 @@
           标题字体
           <select id="titleFontSelect"></select>
         </label>
+        <label>
+          标题字号
+          <input id="fontSizeInput" type="range" min="72" max="210" value="150">
+        </label>
         <div class="field">
           <div class="field-label-row">
             <span>背景花纹</span>
@@ -116,10 +120,6 @@
         <label>
           花纹强度
           <input id="patternStrength" type="range" min="0" max="80" value="32">
-        </label>
-        <label>
-          主字号
-          <input id="fontSizeInput" type="range" min="72" max="210" value="150">
         </label>
         <div>
           <div class="field-label-row label-text">
@@ -179,6 +179,6 @@
     </section>
   </main>
 
-  <script src="app.js?v=20260505-title-font-links"></script>
+  <script src="app.js?v=20260505-title-font-size"></script>
 </body>
 </html>
