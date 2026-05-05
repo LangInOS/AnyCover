@@ -509,6 +509,13 @@ button {
   min-height: 32px;
 }
 
+.reset-action {
+  width: 100%;
+  margin-top: 2px;
+  color: #d8c999;
+  border-color: rgba(228, 196, 109, .35);
+}
+
 .ghost:hover,
 .multi-toggle:hover,
 .tiny-random:hover {

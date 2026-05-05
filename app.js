@@ -88,6 +88,16 @@ const palettes = [
 const palettesPerPage = 9;
 const defaultPattern = patterns.find((pattern) => pattern.id === 'corners') || patterns[0];
 const previewLayoutStorageKey = 'anycover.previewLayout.v2';
+const legacyPreviewLayoutStorageKey = 'anycover.previewLayout.v1';
+const defaultInputValues = {
+  tagInput: 'ANYCOVER',
+  leadInput: '把一个观点做成',
+  titleInput: '能让人停下来的`封面`',
+  watermarkInput: '',
+  signInput: 'AnyCover · creator · 2026',
+  patternStrength: '32',
+  fontSizeInput: '150'
+};
 
 const titleFonts = [
   { id: 'serif-sc', name: '思源宋体·重体', family: '"Noto Serif SC", "Source Han Serif SC", "Songti SC", STSong, SimSun, serif', normal: 850, highlight: 900 },
@@ -348,6 +358,7 @@ function bindEvents() {
   $('exportAllBtn').addEventListener('click', exportAllPng);
   $('randomStyleBtn').addEventListener('click', randomStyle);
   $('generateBatchBtn').addEventListener('click', generateVariants);
+  $('resetStateBtn').addEventListener('click', resetToInitialState);
   $('randomPatternBtn').addEventListener('click', randomPattern);
   $('randomPaletteBtn').addEventListener('click', randomPalette);
   $('cyclePaletteBtn').addEventListener('click', cyclePaletteGroup);
@@ -381,6 +392,46 @@ function setMultiPlatform(enabled) {
   render();
   setBatchMeta();
   refreshVariants();
+}
+
+function resetToInitialState() {
+  clearSavedPreviewLayout();
+  Object.entries(defaultInputValues).forEach(([id, value]) => {
+    $(id).value = value;
+  });
+  state.mode = 'batch';
+  state.platform = platforms[0];
+  state.selectedPlatformIds = platforms.map((platform) => platform.id);
+  state.horizontalTemplate = horizontalTemplates[0];
+  state.verticalTemplate = verticalTemplates[0];
+  state.pattern = defaultPattern;
+  state.titleFont = titleFonts[0];
+  state.palette = palettes[0];
+  state.palettePage = 0;
+  state.variantSeed = 0;
+  state.variants = [];
+  state.previewPositions = {};
+  state.previewZ = 1;
+  state.previewGrid = false;
+  $('titleFontSelect').value = state.titleFont.id;
+  $('patternSelect').value = state.pattern.id;
+  syncPreviewGrid();
+  syncModeUI();
+  syncPlatformGrid();
+  syncTemplateSelect();
+  buildPaletteGrid();
+  render();
+  setBatchMeta('已恢复初始状态');
+  refreshVariants();
+}
+
+function clearSavedPreviewLayout() {
+  try {
+    localStorage.removeItem(previewLayoutStorageKey);
+    localStorage.removeItem(legacyPreviewLayoutStorageKey);
+  } catch (error) {
+    // Storage cleanup is best effort.
+  }
 }
 
 function enterSinglePlatform(platform) {
