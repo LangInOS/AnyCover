@@ -146,6 +146,18 @@ function templateForPlatform(platform, offset = 0) {
   return templates[offset % templates.length];
 }
 
+function platformIcon(id) {
+  const icons = {
+    x: '<svg class="platform-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"></path></svg>',
+    youtube: '<svg class="platform-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="17" height="11" rx="3"></rect><path d="M10 9.5l5 2.5-5 2.5Z"></path></svg>',
+    wechat: '<svg class="platform-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 6C6.9 6 4 8.2 4 11c0 1.5.8 2.8 2.1 3.7L5.5 17l2.6-1.2c.8.2 1.6.3 2.4.3 3.6 0 6.5-2.2 6.5-5.1S14.1 6 10.5 6Z"></path><path d="M14 12.5c3.2 0 5.7 1.9 5.7 4.3 0 1.1-.6 2.2-1.6 3l.5 2-2.2-1c-.7.2-1.5.3-2.4.3-2.5 0-4.7-1.2-5.4-2.9"></path></svg>',
+    channels: '<svg class="platform-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="3"></rect><path d="M10 9l5 3-5 3Z"></path></svg>',
+    xiaohongshu: '<svg class="platform-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2Z"></path><path d="M9 8h6M9 11h5"></path></svg>',
+    douyin: '<svg class="platform-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4v10.5a4 4 0 1 1-3-3.9"></path><path d="M14 7c1.4 2.2 3.1 3.4 5 3.5"></path></svg>'
+  };
+  return icons[id] || '';
+}
+
 function buildPlatformGrid() {
   const grid = $('platformGrid');
   grid.innerHTML = '';
@@ -154,7 +166,7 @@ function buildPlatformGrid() {
     chip.type = 'button';
     chip.className = 'platform-chip';
     chip.dataset.id = platform.id;
-    chip.innerHTML = `<strong>${platform.name}</strong><small>${platform.width}x${platform.height} · ${platform.ratio}</small>`;
+    chip.innerHTML = `<span class="platform-chip-main">${platformIcon(platform.id)}<strong>${platform.name}</strong></span><small>${platform.width}x${platform.height} · ${platform.ratio}</small>`;
     chip.addEventListener('click', () => handlePlatformClick(platform));
     grid.appendChild(chip);
   });
@@ -385,7 +397,7 @@ function renderMultiPreview(input = getInput(), palette = state.palette, pattern
     card.type = 'button';
     card.className = `platform-preview-card ${previewShapeClass(platform)}${platform.id === state.platform.id ? ' focused' : ''}`;
     card.dataset.platformId = platform.id;
-    card.innerHTML = `<header><strong>${platform.name}</strong><span>${platform.width}x${platform.height}</span></header>`;
+    card.innerHTML = `<header><span class="preview-platform-title">${platformIcon(platform.id)}<strong>${platform.name}</strong></span><span>${platform.width}x${platform.height}</span></header>`;
     const previewCanvas = document.createElement('canvas');
     previewCanvas.width = platform.width;
     previewCanvas.height = platform.height;

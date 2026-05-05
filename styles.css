@@ -355,10 +355,34 @@ button {
   text-align: left;
 }
 
+.platform-chip-main,
+.preview-platform-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 6px;
+}
+
+.platform-icon {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .platform-chip strong {
+  min-width: 0;
   color: var(--text);
   font-size: 12px;
   line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .platform-chip small {
@@ -497,6 +521,11 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.platform-preview-card .platform-icon {
+  width: 14px;
+  height: 14px;
 }
 
 .platform-preview-card header span {
