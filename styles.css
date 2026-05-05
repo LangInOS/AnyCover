@@ -92,9 +92,9 @@ p {
 }
 
 .panel-title-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   margin-bottom: 10px;
   padding-bottom: 9px;
@@ -110,7 +110,6 @@ p {
 .compact-mode-toggle {
   display: inline-flex;
   align-items: center;
-  justify-self: end;
   gap: 4px;
   min-height: 12px;
   max-width: 72px;
@@ -136,6 +135,7 @@ p {
 
 .multi-toggle {
   position: relative;
+  align-items: center;
   color: var(--muted);
   font-size: 12px;
   font-weight: 750;
